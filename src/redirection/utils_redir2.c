@@ -58,3 +58,37 @@ bool	is_redir(char **args, int i, int j)
 {
 	return (args && args[i] && (args[i][j] == '<' || args[i][j] == '>'));
 }
+
+/* moved to utils_redir3.c to satisfy norm function count */
+
+void	handle_echo_skip(char **args, t_node *node)
+{
+	if (!ft_strncmp(args[0], "echo", 5)
+		&& !ft_strncmp(args[1], "./", 2)
+		&& !args[2])
+		node->echo_skip = 1;
+}
+
+int	open_redir_out(char **args, int i, t_node *node, int flags)
+{
+	int		fd;
+	char	*expanded_path;
+
+	expanded_path = expand_wildcard_redir(args[i + 1], node);
+	if (!expanded_path)
+	{
+		ft_putstr_fd("bash: ", STDERR_FILENO);
+		ft_putstr_fd(args[i + 1], STDERR_FILENO);
+		ft_putendl_fd(": ambiguous redirect", STDERR_FILENO);
+		set_exit_status(1);
+		return (-1);
+	}
+	fd = open(expanded_path, flags, 0644);
+	free(expanded_path);
+	if (fd < 0)
+	{
+		print_err(args, i, node);
+		return (-1);
+	}
+	return (fd);
+}

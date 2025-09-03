@@ -48,3 +48,41 @@ bool	is_redir_check(char *str)
 {
 	return (islr(str) || isrr(str) || isdrr(str) || isdlr(str));
 }
+
+/* moved to utils_redir2.c to balance norm function count */
+
+static int	left_redir_error(const char *s, int type, char *tmp)
+{
+	if (type == 0)
+	{
+		ft_putstr_fd("bash: ", STDERR_FILENO);
+		ft_putstr_fd(s, STDERR_FILENO);
+		ft_putendl_fd(": ambiguous redirect", STDERR_FILENO);
+	}
+	else
+	{
+		ft_putstr_fd("bash: ", STDERR_FILENO);
+		ft_putstr_fd(s, STDERR_FILENO);
+		ft_putendl_fd(": No such file or directory", STDERR_FILENO);
+	}
+	set_exit_status(1);
+	if (tmp)
+		free(tmp);
+	return (1);
+}
+
+int	left_redir_expand(char **args, int i, t_node *node, char **expanded)
+{
+	char	*tmp;
+
+	tmp = expand_wildcard_redir(args[i + 1], node);
+	if (!tmp)
+		return (left_redir_error(args[i + 1], 0, NULL));
+	if (ft_strncmp(tmp, args[i + 1], ft_strlen(args[i + 1]) + 1) == 0
+		&& ft_strchr(args[i + 1], '*'))
+		return (left_redir_error(args[i + 1], 1, tmp));
+	if (access(tmp, R_OK))
+		return (left_redir_error(tmp, 1, tmp));
+	*expanded = tmp;
+	return (0);
+}

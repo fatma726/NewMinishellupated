@@ -11,15 +11,16 @@ CPPFLAGS = -I./include $(READLINE_INC)
 
 # Explicit Homebrew macOS flags (requested)
 CFLAGS += -I/opt/homebrew/opt/readline/include
-LDFLAGS += -L/opt/homebrew/opt/readline/lib -lreadline
+# Avoid linking readline twice; only extend the search path here
+LDFLAGS += -L/opt/homebrew/opt/readline/lib
 
 INCLUDE_DIR = ./include
 
 MAIN = env_utils env_helpers file_utils global global_accessors input_utils input_helpers main process_command numeric_utils run_commands strarrutils termios_utils stubs
-CMD = alias alias_helpers cd cd_helpers cd_helpers2 cd_pwd echo env exec exec_error exec_helpers exec_proc exit exit_helpers2 exit_helpers3 export export_helpers export_helpers2 export_helpers3 export2 history pwd unset unset_helpers unset_helpers2
+CMD = alias alias_helpers cd cd_helpers cd_helpers2 cd_pwd echo env exec exec_error exec_helpers exec_proc exit exit_helpers2 exit_helpers3 export export_helpers export_helpers2 export_helpers3 export2 history pwd unset unset_helpers unset_helpers2 exec_check_utils
 PARSER =  escape_split expand_alias expand_envvar expand_wildcard get_arg_num get_file_list get_length hash_handler is is2 load_lst parser prompt quote_check rm_quotes semicolon_handler semicolon_helpers syntax syntax_helpers syntax_helpers2 syntax_helpers3
 REDIR = argu_cleanup cmd_redir exec_redir redir_helpers utils_redir utils_redir2 utils_redir3
-PIPE = utils_pipe utils_pipe2 utils_pipe3
+PIPE = utils_pipe utils_pipe2 utils_pipe3 utils_pipe4
 
 
 SRCS =	$(addsuffix .c, $(addprefix src/core/, $(MAIN))) \
@@ -44,9 +45,9 @@ clean :
 	@make clean -s -C libs/Libft
 	@rm -rf $(OBJS) "|" "<" ">" ">>" .temp asd echo grep la lol minishell.dSYM o out0 out1 tmp_*
 
-debug : fclean
+debug : clean
 	@make debug -s -C libs/Libft
-	$(CC) $(CFLAGS) $(CPPFLAGS) -g -fsanitize=address $(LDFLAGS) $(OBJS) -o $(NAME)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -g -fsanitize=address $(LDFLAGS) $(SRCS) -o $(NAME)
 
 fclean : clean
 	@make fclean -s -C libs/Libft

@@ -14,7 +14,7 @@
 
 static bool	is_blank(const char *s)
 {
-	int		 i;
+	int	i;
 
 	i = 0;
 	while (s && s[i])
@@ -26,56 +26,67 @@ static bool	is_blank(const char *s)
 	return (true);
 }
 
-static bool	has_conditional_or_semicolon(const char *s, t_node *n)
+static int	find_unquoted_oror(const char *s, t_node *n)
 {
-	int		 i;
+	int	i;
 
 	i = -1;
 	while (s && s[++i])
-		if (!quote_check(s, i, n)
-			&& (s[i] == ';'
-				|| (s[i] == '&' && s[i + 1] == '&')
-				|| (s[i] == '|' && s[i + 1] == '|')
-				|| (s[i] == '&' && s[i + 1] != '&')))
-			return (true);
-	return (false);
+		if (!quote_check(s, i, n) && s[i] == '|' && s[i + 1] == '|')
+			return (i);
+	return (-1);
 }
 
-static int	find_unquoted_oror(const char *s, t_node *n)
+static char	**run_oror(char *hashed, int idx, char **envp, t_node *n)
 {
-    int i;
+	char	*left;
+	char	*right;
+	size_t	off;
 
-    i = -1;
-    while (s && s[++i])
-        if (!quote_check(s, i, n) && s[i] == '|' && s[i + 1] == '|')
-            return (i);
-    return (-1);
+	left = ft_substr(hashed, 0, (size_t)idx);
+	off = (size_t)(idx + 2);
+	right = ft_substr(hashed, (unsigned int)off, ft_strlen(hashed) - off);
+	if (is_blank(left) || is_blank(right))
+	{
+		set_exit_status(2);
+		n->syntax_flag = true;
+		ft_putstr_fd("minishell: syntax error near unexpected token `",
+			STDERR_FILENO);
+		ft_putendl_fd("||'", STDERR_FILENO);
+		free(left);
+		free(right);
+		free(hashed);
+		return (envp);
+	}
+	envp = parser(left, envp, n);
+	if (get_exit_status())
+		envp = parser(right, envp, n);
+	free(hashed);
+	return (envp);
 }
 
 static char	**dispatch_line(char *hashed, char **envp, t_node *n)
 {
-    int	idx;
-    char	*left;
-    char	*right;
-    size_t start;
-    size_t len;
+	int	idx;
+	int	i;
 
-    idx = find_unquoted_oror(hashed, n);
-    if (idx >= 0)
-    {
-        left = ft_substr(hashed, 0, (size_t)idx);
-        start = (size_t)(idx + 2);
-        len = ft_strlen(hashed) - start;
-        right = ft_substr(hashed, (unsigned int)start, len);
-        envp = parser(left, envp, n);
-        if (get_exit_status())
-            envp = parser(right, envp, n);
-        free(hashed);
-        return (envp);
-    }
-    if (has_conditional_or_semicolon(hashed, n))
-        return (subshell(hashed, envp, n));
-    return (parser(hashed, envp, n));
+	i = 0;
+	while (hashed[i] && (hashed[i] == ' ' || hashed[i] == '\t'))
+		i++;
+	if (hashed[i] == ';')
+	{
+		ft_putstr_fd("minishell: syntax error near unexpected token `",
+			STDERR_FILENO);
+		ft_putendl_fd(";'", STDERR_FILENO);
+		set_exit_status(2);
+		n->syntax_flag = true;
+		free(hashed);
+		return (envp);
+	}
+	idx = find_unquoted_oror(hashed, n);
+	if (idx >= 0)
+		return (run_oror(hashed, idx, envp, n));
+	return (subshell(hashed, envp, n));
 }
 
 char	**process_command(char *line, char **envp, t_node *n)

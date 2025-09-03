@@ -37,6 +37,7 @@ CORE_OBJS	:= \
 	../src/cmd/exec_error.o \
 	../src/cmd/exec_helpers.o \
 	../src/cmd/exec_proc.o \
+	../src/cmd/exec_check_utils.o \
 	../src/cmd/exit.o \
 	../src/cmd/exit_helpers2.o \
 	../src/cmd/exit_helpers3.o \
@@ -80,7 +81,8 @@ CORE_OBJS	:= \
 	../src/redirection/utils_redir3.o \
 	../src/pipe/utils_pipe.o \
 	../src/pipe/utils_pipe2.o \
-	../src/pipe/utils_pipe3.o
+	../src/pipe/utils_pipe3.o \
+	../src/pipe/utils_pipe4.o
 
 BONUS_DIR	:= src/bonus
 OBJ_DIR		:= obj

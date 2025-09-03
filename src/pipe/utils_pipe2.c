@@ -60,35 +60,25 @@ static void	repeat_exec(char **args, char **envp, t_node *node, int pid)
 	waitpid(pid, 0, 0);
 }
 
+/* moved helpers to utils_pipe4.c */
+
 char	**repeat(char **args, char **envp, t_node *node)
 {
-    int	pid;
-    int	redir_err;
+	int	pid;
+	int	redir_err;
 
-    pid = 0;
-    node->redir_flag = redir_chk(node->ori_args);
-    redir_err = 0;
-    /* detect pipeline first to decide behavior on redir errors */
-    (void)pipe_check(args, node);
-    if (node->redir_flag)
-        redir_err = redir_excute(args, envp, node, 0);
-    /* redirections may remove tokens and shift indices; refresh pipe index */
-    (void)pipe_check(args, node);
-    if (redir_err)
-    {
-        if (node->pipe_flag)
-            node->child_die = 1;
-        else
-            return (envp);
-    }
-	if (node->pipe_flag)
+	redir_err = prepare_redirections(args, envp, node);
+	if (redir_err)
 	{
-		pipe(node->fds);
-		pid = fork();
-		if (pid < 0)
+		if (node->pipe_flag)
+			node->child_die = 1;
+		else
 			return (envp);
 	}
-	else
+	pid = maybe_setup_pipe(node);
+	if (pid < 0)
+		return (envp);
+	if (!node->pipe_flag)
 		return (one_commnad(args, envp, node));
 	repeat_exec(args, envp, node, pid);
 	return (envp);

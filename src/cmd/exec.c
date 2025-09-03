@@ -6,100 +6,41 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/08/28 15:52:16 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/03 18:43:48 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-char	**cmd_exec(char **args, char **envp, t_node *node)
+static int	parse_background(char ***pargs)
 {
-	int	pid;
-	int	status;
-	bool	background = false;
-	int	last;
+	char	**args;
+	int		last;
 
-	// Check if this command should run in background
-	if (args)
+	args = *pargs;
+	if (!args)
+		return (0);
+	last = 0;
+	while (args[last])
+		last++;
+	if (last > 0 && is_ampersand(args[last - 1]))
 	{
-		last = 0;
-		while (args[last])
-			last++;
-		if (last > 0 && is_ampersand(args[last - 1]))
-		{
-			background = true;
-			args[last - 1] = NULL;
-		}
-		else if (args[0] && is_ampersand(args[0]))
-		{
-			background = true;
-			args = args + 1;
-		}
+		args[last - 1] = NULL;
+		return (1);
 	}
-
-	if (node->argmode)
-		envp = shlvl_mod(-1, envp);
-	pid = fork();
-	if (!pid)
-		exec_proc(args, envp, node);
-	
-	if (background)
+	if (args[0] && is_ampersand(args[0]))
 	{
-		// Don't wait for background processes
-		set_exit_status(0);
-	}
-	else
-	{
-		waitpid(pid, &status, 0);
-		if (status == 2 || status == 3)
-			set_exit_status(128 + status);
-		else
-			set_exit_status(status / 256);
-	}
-	
-	if (node->argmode)
-		envp = shlvl_mod(1, envp);
-	return (envp);
-}
-
-static char	*build_path(char *dir, char *cmd)
-{
-	size_t	n;
-	char	*path;
-
-	n = ft_strlen(dir) + ft_strlen(cmd) + 2;
-	path = malloc(n);
-	if (!path)
-		return (NULL);
-	ft_strlcpy(path, dir, n);
-	ft_strlcat(path, "/", n);
-	ft_strlcat(path, cmd, n);
-	return (path);
-}
-
-static bool	exec_check_loop(char **paths, char **args)
-{
-	size_t	i;
-	char	*path;
-
-	i = 0;
-	while (paths[i])
-	{
-		path = build_path(paths[i], args[0]);
-		if (!path)
-		{
-			strarrfree(paths);
-			exit(EXIT_FAILURE);
-		}
-		if (!access(path, X_OK))
-		{
-			free(path);
-			return (1);
-		}
-		free(path);
-		i++;
+		*pargs = args + 1;
+		return (1);
 	}
 	return (0);
+}
+
+static char	**maybe_adjust_shlvl(char **envp, int argmode, int delta)
+{
+	if (argmode)
+		return (shlvl_mod(delta, envp));
+	return (envp);
 }
 
 static bool	is_builtin_command(char **args)
@@ -128,4 +69,19 @@ bool	exec_check(char **args, char **envp, t_node *node)
 	ret = exec_check_loop(paths, args);
 	strarrfree(paths);
 	return (ret);
+}
+
+char	**cmd_exec(char **args, char **envp, t_node *node)
+{
+	int	pid;
+	int	background;
+
+	background = parse_background(&args);
+	envp = maybe_adjust_shlvl(envp, node->argmode, -1);
+	pid = fork();
+	if (!pid)
+		exec_proc(args, envp, node);
+	post_wait_set_status(pid, background);
+	envp = maybe_adjust_shlvl(envp, node->argmode, 1);
+	return (envp);
 }

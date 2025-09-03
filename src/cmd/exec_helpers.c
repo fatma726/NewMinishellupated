@@ -85,3 +85,19 @@ void	exec_proc_loop(char **paths, char **args, char **envp, t_node *node)
 	ft_strlcat(node->path, args[0], n);
 	exec_proc_loop2(paths, args, envp, node);
 }
+
+void	post_wait_set_status(int pid, int background)
+{
+	int	status;
+
+	if (background)
+	{
+		set_exit_status(0);
+		return ;
+	}
+	waitpid(pid, &status, 0);
+	if (status == 2 || status == 3)
+		set_exit_status(128 + status);
+	else
+		set_exit_status(status / 256);
+}

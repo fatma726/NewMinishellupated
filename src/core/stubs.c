@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+
 t_language	get_lang(char **envp)
 {
 	(void)envp;
@@ -41,6 +42,7 @@ const char	*i18n(t_message arg, t_language language)
 }
 
 #ifndef BUILD_BONUS
+
 char	**split_operators(char *s, char **envp, t_node *n)
 {
 	(void)s;
@@ -50,8 +52,6 @@ char	**split_operators(char *s, char **envp, t_node *n)
 
 char	**subshell(char *str, char **envp, t_node *node)
 {
-	(void)str;
-	(void)node;
-	return (envp);
+	return (parser(str, envp, node));
 }
 #endif

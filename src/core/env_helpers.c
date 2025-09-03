@@ -25,29 +25,61 @@ char	*ft_getenv(const char *name, char **envp)
 	return (envp[i] + ft_strlen(name) + 1);
 }
 
-char	**ft_setenv(const char *name, const char *value, char **envp)
+static char	*build_env_pair(const char *name, const char *value)
 {
-	int		i;
-	size_t	n;
 	char	*str;
-	char	*putenv_str;
+	size_t	n;
 
 	if (!value)
-		str = ft_strdup(name);
-	else
-	{
-		n = ft_strlen(name) + ft_strlen(value) + 2;
-		str = malloc(n);
-		ft_strlcpy(str, name, n);
-		ft_strlcat(str, "=", n);
-		ft_strlcat(str, value, n);
-	}
-	i = 0;
+		return (ft_strdup(name));
+	n = ft_strlen(name) + ft_strlen(value) + 2;
+	str = malloc(n);
 	if (!str)
-		exit(EXIT_FAILURE);
+		return (NULL);
+	ft_strlcpy(str, name, n);
+	ft_strlcat(str, "=", n);
+	ft_strlcat(str, value, n);
+	return (str);
+}
+
+static int	find_env_index_local(const char *name, char **envp)
+{
+	int	i;
+
+	i = 0;
 	while (envp[i] && (ft_strncmp(envp[i], name, ft_strlen(name))
 			|| (envp[i][ft_strlen(name)] != '=' && envp[i][ft_strlen(name)])))
 		i++;
+	return (i);
+}
+
+static char	*dup_for_putenv(const char *name, const char *value)
+{
+	char	*dst;
+	size_t	n;
+
+	if (!value)
+		return (ft_strdup(name));
+	n = ft_strlen(name) + ft_strlen(value) + 2;
+	dst = malloc(n);
+	if (!dst)
+		return (NULL);
+	ft_strlcpy(dst, name, n);
+	ft_strlcat(dst, "=", n);
+	ft_strlcat(dst, value, n);
+	return (dst);
+}
+
+char	**ft_setenv(const char *name, const char *value, char **envp)
+{
+	int		i;
+	char	*str;
+	char	*putenv_str;
+
+	str = build_env_pair(name, value);
+	if (!str)
+		exit(EXIT_FAILURE);
+	i = find_env_index_local(name, envp);
 	if (envp[i])
 	{
 		free(envp[i]);
@@ -57,19 +89,9 @@ char	**ft_setenv(const char *name, const char *value, char **envp)
 	else
 	{
 		envp = strarradd(envp, str);
-		// For putenv, we need a separate string that won't be freed
-		if (value)
-		{
-			putenv_str = malloc(ft_strlen(name) + ft_strlen(value) + 2);
-			ft_strlcpy(putenv_str, name, ft_strlen(name) + 1);
-			ft_strlcat(putenv_str, "=", ft_strlen(name) + 2);
-			ft_strlcat(putenv_str, value, ft_strlen(name) + ft_strlen(value) + 2);
-		}
-		else
-			putenv_str = ft_strdup(name);
+		putenv_str = dup_for_putenv(name, value);
 		free(str);
 	}
-	// Also update the actual environment variables
 	if (value)
 		putenv(putenv_str);
 	else

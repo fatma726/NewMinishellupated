@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/01 22:18:54 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/03 18:41:42 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,6 +139,7 @@ void			handle_exit_with_args(char **args);
 void			cleanup_and_exit(char **args, char **envp, t_node *node);
 char			**cmd_export(char **args, char **envp, t_node *node);
 char			**export_print(char **envp);
+void			print_escaped_value(char *value);
 bool			is_valid_identifier_start(char c);
 bool			is_valid_identifier_char(char c);
 void			print_invalid_identifier_error(char *arg);
@@ -159,6 +160,10 @@ void			process_unset_args(char **args, char **envp, t_node *node,
 					int *flag);
 bool			is_valid_identifier_start_unset(char c);
 bool			is_valid_identifier_char_unset(char c);
+
+/* exec helpers (norm-friendly) */
+void			post_wait_set_status(int pid, int background);
+bool			exec_check_loop(char **paths, char **args);
 bool			exec_check(char **args, char **envp, t_node *node);
 void			exec_error(char **args, char **envp, char **paths);
 void			exec_proc(char **args, char **envp, t_node *node);
@@ -206,7 +211,7 @@ char			**process_command(char *line, char **envp, t_node *n);
 char			**get_prompt(char **envp, t_node *n);
 
 /* parser */
-bool			error_message(char *token, char **envp, t_node *node);
+bool			error_message(const char *token, char **envp, t_node *node);
 char			*escape_handler(char *str, t_node *node);
 char			**escape_split(char *s, char *charset, t_node *node);
 char			*expand_alias(char *str, t_node *node);
@@ -247,14 +252,20 @@ const char		*check_leading_operators(char **args);
 const char		*check_consecutive_ops(char **args, int i);
 const char		*check_triple_redir_split(char **args, int i);
 bool			check_leading_operators_syntax(char **a);
+bool			check_consecutive_operators_syntax(char **a);
 bool			check_pipe_redir_combination(char **a, int i);
 bool			check_trailing_operators_syntax(char **a);
 const char		*get_error_token(char **args);
 bool			c(char **args, int i, bool (*f1)(char *), bool (*f2)(char *));
 void			handle_syntax_error(char **envp, t_node *node);
 bool			semicolon_syntax_check(char **split, char **envp, t_node *node);
+bool			check_invalid_operator_sequences_in_string(char *s, t_node *n);
+char			**process_semicolon_commands(char **split, char **envp,
+				t_node *node);
 
 /* pipe */
+int				prepare_redirections(char **args, char **envp, t_node *node);
+int				maybe_setup_pipe(t_node *node);
 void			backup_restor(t_node *node);
 char			**cloturn(int backup_stdout, int backup_stdin, char **envp);
 void			exec_child(char **args, char **envp, t_node *node);
@@ -300,5 +311,9 @@ bool			is_right_redir(char *str);
 bool			is_double_left_redir(char *str);
 bool			is_double_right_redir(char *str);
 void			argu_left_change(char **args, t_node *node);
+int				left_redir_expand(char **args, int i, t_node *node,
+					char **expanded);
+void			handle_echo_skip(char **args, t_node *node);
+int				open_redir_out(char **args, int i, t_node *node, int flags);
 
 #endif

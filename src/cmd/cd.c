@@ -13,7 +13,7 @@
 #include "../include/minishell.h"
 
 static void	handle_cd_arguments(char **args, char **envp, t_node *node,
-		bool offset)
+			bool offset)
 {
 	char	*home_path;
 	char	*cwd;
@@ -25,13 +25,9 @@ static void	handle_cd_arguments(char **args, char **envp, t_node *node,
 		node->pwd = ft_strdup(home_path);
 	}
 	else if (!ft_strncmp(args[1 + offset], "-", 2))
-	{
-		// For cd -, node->pwd is already updated in handle_oldpwd_cd
-		// No additional action needed here
-	}
+		;
 	else
 	{
-		// For regular paths, update node->pwd with current working directory
 		cwd = getcwd(NULL, 0);
 		if (cwd)
 		{
@@ -54,11 +50,7 @@ char	**cmd_cd(char **args, char **envp, t_node *node)
 	if (args[1] && !ft_strncmp(args[1], "--", 3))
 		offset++;
 	if (args[1 + offset] && !args[1 + offset][0] && !args[2 + offset])
-	{
-		envp = ft_setenv("OLDPWD", ft_getenv("PWD", envp), envp);
-		return (envp);
-	}
-	// Save the current PWD before changing directory
+		return (ft_setenv("OLDPWD", ft_getenv("PWD", envp), envp));
 	old_pwd = ft_strdup(ft_getenv("PWD", envp));
 	if (checks(args, envp, node, offset))
 	{

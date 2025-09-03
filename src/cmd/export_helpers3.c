@@ -12,6 +12,20 @@
 
 #include "../include/minishell.h"
 
+void	print_escaped_value(char *value)
+{
+	size_t	i;
+
+	i = 0;
+	while (value[i])
+	{
+		if (value[i] == '"' || value[i] == '\\' || value[i] == '$')
+			ft_putchar_fd('\\', STDOUT_FILENO);
+		ft_putchar_fd(value[i], STDOUT_FILENO);
+		i++;
+	}
+}
+
 bool	is_valid_identifier_start(char c)
 {
 	return (c && c != '=' && !ft_isdigit(c));

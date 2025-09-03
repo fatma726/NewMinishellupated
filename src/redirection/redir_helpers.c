@@ -40,6 +40,21 @@ void	move_redir_args(char **args, char **ori_args, int *i)
 	}
 }
 
+static void	write_heredoc_line(bool expand_vars, char *line,
+					char **envp, t_node *node)
+{
+	char	*expanded_line;
+
+	if (expand_vars)
+	{
+		expanded_line = expand_envvar(line, envp, node);
+		ft_putendl_fd(expanded_line, node->redir_fd);
+		free(expanded_line);
+	}
+	else
+		ft_putendl_fd(line, node->redir_fd);
+}
+
 int	heredoc_loop(char **args, char **envp, int *i, t_node *node)
 {
 	char	*line;
@@ -47,7 +62,7 @@ int	heredoc_loop(char **args, char **envp, int *i, t_node *node)
 	bool	expand_vars;
 
 	delimiter = args[*i + 1];
-	expand_vars = (ft_strchr(delimiter, '"') == NULL && ft_strchr(delimiter, '\'') == NULL);
+	expand_vars = (!ft_strchr(delimiter, '"') && !ft_strchr(delimiter, '\''));
 	if (setup_heredoc_file(node))
 		return (1);
 	while (1)
@@ -60,14 +75,7 @@ int	heredoc_loop(char **args, char **envp, int *i, t_node *node)
 			free(line);
 			break ;
 		}
-		if (expand_vars)
-		{
-			char *expanded_line = expand_envvar(line, envp, node);
-			ft_putendl_fd(expanded_line, node->redir_fd);
-			free(expanded_line);
-		}
-		else
-			ft_putendl_fd(line, node->redir_fd);
+		write_heredoc_line(expand_vars, line, envp, node);
 		free(line);
 	}
 	cleanup_heredoc_file(node);

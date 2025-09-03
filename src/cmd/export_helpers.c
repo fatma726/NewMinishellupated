@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatmtahmdab       #+#    #+#             */
-/*   Updated: 2025/08/30 10:00:04 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/03 19:00:52 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,54 +14,61 @@
 
 static void	print_declare_line(char *entry)
 {
-    size_t	i;
-    char	*name;
-    char	*value;
+	size_t	i;
+	char	*name;
+	char	*value;
 
-    i = 0;
-    while (entry[i] && entry[i] != '=')
-        i++;
-    name = ft_substr(entry, 0, i);
-    if (entry[i] == '=')
-        value = ft_strdup(entry + i + 1);
-    else
-        value = NULL;
-    ft_putstr_fd("declare -x ", STDOUT_FILENO);
-    ft_putstr_fd(name, STDOUT_FILENO);
-    if (value && (value[0] || ft_strncmp(name, "OLDPWD", 7)))
-    {
-        ft_putstr_fd("=\"", STDOUT_FILENO);
-        ft_putstr_fd(value, STDOUT_FILENO);
-        ft_putstr_fd("\"", STDOUT_FILENO);
-    }
-    ft_putchar_fd('\n', STDOUT_FILENO);
-    free(name);
-    if (value)
-        free(value);
+	i = 0;
+	while (entry[i] && entry[i] != '=')
+		i++;
+	name = ft_substr(entry, 0, i);
+	if (entry[i] == '=')
+		value = ft_strdup(entry + i + 1);
+	else
+		value = NULL;
+	ft_putstr_fd("declare -x ", STDOUT_FILENO);
+	ft_putstr_fd(name, STDOUT_FILENO);
+	if (value && (value[0] || ft_strncmp(name, "OLDPWD", 7)))
+	{
+		ft_putstr_fd("=\"", STDOUT_FILENO);
+		print_escaped_value(value);
+		ft_putstr_fd("\"", STDOUT_FILENO);
+	}
+	ft_putchar_fd('\n', STDOUT_FILENO);
+	free(name);
+	if (value)
+		free(value);
+}
+
+static void	print_sorted_env(char **envp)
+{
+	int		i;
+	size_t	idx;
+	char	*lowest;
+	char	*prev;
+
+	idx = 0;
+	prev = NULL;
+	while (idx < strarrlen(envp))
+	{
+		lowest = NULL;
+		i = -1;
+		while (envp[++i])
+			if ((!lowest || ft_strncmp(envp[i], lowest, ft_strlen(envp[i])) < 0)
+				&& (!idx || ft_strncmp(envp[i], prev, ft_strlen(envp[i])) > 0))
+				lowest = envp[i];
+		if (lowest && ft_strncmp(lowest, "_=", 2))
+			print_declare_line(lowest);
+		prev = lowest;
+		idx++;
+	}
 }
 
 char	**export_print(char **envp)
 {
-	int		i;
-	size_t	i2;
-	char	*lowest;
-	char	*lowest_old;
-
-	i2 = 0;
-	while (i2 < strarrlen(envp))
-	{
-		lowest = 0;
-		i = -1;
-		while (envp[++i])
-			if ((!lowest || ft_strncmp(envp[i], lowest, ft_strlen(envp[i])) < 0)
-				&& (!i2 || ft_strncmp(envp[i], lowest_old,
-						ft_strlen(envp[i])) > 0))
-				lowest = envp[i];
-		if (lowest && ft_strncmp(lowest, "_=", 2))
-			print_declare_line(lowest);
-		lowest_old = lowest;
-		i2++;
-	}
+	print_sorted_env(envp);
+	if (!ft_getenv("OLDPWD", envp))
+		ft_putstr_fd("declare -x OLDPWD\n", STDOUT_FILENO);
 	fflush(stdout);
 	return (envp);
 }
@@ -93,7 +100,6 @@ void	process_export_args(char **args, char ***envp, t_node *node)
 	{
 		if (!process_export_arg(args[i], envp, node))
 			has_error = true;
-		// Continue processing remaining arguments even if one fails
 	}
 	if (has_error)
 		set_exit_status(EXIT_FAILURE);

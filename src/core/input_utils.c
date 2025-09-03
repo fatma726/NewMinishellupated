@@ -57,8 +57,8 @@ void	argmode(char *line, char *arg, char **envp, t_node *node)
 	process_quotes(arg, node);
 	init_node(node);
 	node->argmode = true;
-	if (ft_strncmp(line, "\0", 1))
-		envp = subshell(hash_handler(line, node), envp, node);
+	if (arg && *arg)
+		envp = subshell(hash_handler(ft_strdup(arg), node), envp, node);
 	else
 		free(line);
 	strarrfree(envp);

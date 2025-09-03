@@ -3,16 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
+/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/03 09:49:50 by fatima           ###   ########.fr       */
+/*   Updated: 2025/09/03 19:00:33 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-
-/* helpers moved to process_command.c to reduce functions in this file */
 
 static void	handle_signals(void)
 {
@@ -33,13 +31,6 @@ static char	*get_and_process_prompt(char **envp, t_node *n)
 		prompt = "\\s-\\v\\$ ";
 	prompt_copy = ft_strdup(prompt);
 	return (expand_prompt(prompt_copy, envp, n));
-}
-
-static char	**ensure_oldpwd_empty(char **envp)
-{
-    if (!ft_getenv("OLDPWD", envp))
-        return (ft_setenv("OLDPWD", "", envp));
-    return (envp);
 }
 
 static char	**main_loop(char **envp, t_node *n)
@@ -72,7 +63,6 @@ int	main(int argc, char **argv)
 	set_exit_status(0);
 	envp = shlvl_plus_plus(setpwd(&node, strarrdup(environ)));
 	envp = ft_setenv("_", argv[0], envp);
-    envp = ensure_oldpwd_empty(envp);
 	node.path_fallback = NULL;
 	node.line_nbr = 0;
 	node.aliases = malloc(sizeof(char **));

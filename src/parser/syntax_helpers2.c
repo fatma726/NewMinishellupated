@@ -47,3 +47,32 @@ bool	check_trailing_operators_syntax(char **a)
 		return (false);
 	return (true);
 }
+
+static bool	is_bare_operator(char *s)
+{
+	if (!s)
+		return (false);
+	if (ft_strchr(s, '\'') || ft_strchr(s, '"'))
+		return (false);
+	return (isp(s) || islr(s) || isrr(s) || isdlr(s)
+		|| isdrr(s) || isdp(s) || isda(s) || is_ampersand(s));
+}
+
+bool	check_consecutive_operators_syntax(char **a)
+{
+	int	i;
+
+	i = 0;
+	while (a[i] && a[i + 1])
+	{
+		if (is_bare_operator(a[i]) && is_bare_operator(a[i + 1]))
+		{
+			if (check_pipe_redir_combination(a, i))
+				i++;
+			else
+				return (false);
+		}
+		i++;
+	}
+	return (true);
+}

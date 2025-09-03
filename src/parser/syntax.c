@@ -59,34 +59,7 @@ static bool	syntax_check_loop(int i, char **a, char **envp, t_node *node)
 	return (true);
 }
 
-static bool	check_consecutive_operators_syntax(char **a)
-{
-	int	i;
-	int	c_op;
-	int	n_op;
-	int	c_q;
-	int	n_q;
-
-	i = 0;
-	while (a[i] && a[i + 1])
-	{
-		c_op = (isp(a[i]) || islr(a[i]) || isrr(a[i])
-				|| isdlr(a[i]) || isdrr(a[i]) || isdp(a[i]) || isda(a[i]) || is_ampersand(a[i]));
-		n_op = (isp(a[i + 1]) || islr(a[i + 1]) || isrr(a[i + 1])
-				|| isdlr(a[i + 1]) || isdrr(a[i + 1]) || isdp(a[i + 1]) || isda(a[i + 1]) || is_ampersand(a[i + 1]));
-		c_q = (ft_strchr(a[i], '\'') || ft_strchr(a[i], '\"'));
-		n_q = (ft_strchr(a[i + 1], '\'') || ft_strchr(a[i + 1], '\"'));
-		if (c_op && n_op && !c_q && !n_q)
-		{
-			if (check_pipe_redir_combination(a, i))
-				i++;
-			else
-				return (false);
-		}
-		i++;
-	}
-	return (true);
-}
+/* moved to syntax_helpers2.c for norm compliance */
 
 bool	syntax_check(char **a, char **envp, t_node *node)
 {

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 static bool	sep(char **s, size_t i, size_t *i3, t_node *node)
 {

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 static int	chkdir_check(DIR *check, int err, bool end)
 {
@@ -41,7 +41,12 @@ static void	handle_directory_error(char **args, int err, int *status, bool end)
 		ft_putstr_fd(is_dir, STDERR_FILENO);
 	}
 	else
-		perror(args[0]);
+	{
+		ft_putstr_fd(args[0], STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+		ft_putstr_fd(strerror(errno), STDERR_FILENO);
+		ft_putstr_fd("\n", STDERR_FILENO);
+	}
 	*status = 126 + (end && errno != EISDIR && errno != EACCES);
 }
 
@@ -78,12 +83,15 @@ void	exec_error(char **args, char **envp, char **paths)
 	if (ft_strchr(args[0], '/') || !paths || !paths[0])
 	{
 		errno = ENOENT;
-		perror(args[0]);
+		ft_putstr_fd(args[0], STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+		ft_putstr_fd(strerror(errno), STDERR_FILENO);
+		ft_putstr_fd("\n", STDERR_FILENO);
 	}
 	else
 	{
 		ft_putstr_fd(args[0], STDERR_FILENO);
-		msg = ft_strdup(i18n(commandnotfound, get_lang(envp)));
+		msg = ft_strdup(": command not found\n");
 		ft_putstr_fd(msg, STDERR_FILENO);
 		free(msg);
 	}
@@ -99,9 +107,12 @@ void	checkdot(char **args, char **envp)
 	char	*msg;
 	char	bash_line[20];
 
-	if (!MSTEST_MODE && !ft_strncmp(args[0], ".", 2))
+	if (!ft_strncmp(args[0], ".", 2))
 	{
-		msg = ft_strdup(i18n(filenameargumentrequired, get_lang(envp)));
+		ft_strlcpy(bash_line, "minishell: ", 20);
+		ft_putstr_fd(bash_line, STDERR_FILENO);
+		ft_putstr_fd(args[0], STDERR_FILENO);
+		msg = ft_strdup(": filename argument required\n");
 		ft_putstr_fd(msg, STDERR_FILENO);
 		free(msg);
 		strarrfree(envp);
@@ -113,7 +124,7 @@ void	checkdot(char **args, char **envp)
 		ft_strlcpy(bash_line, "minishell: ", 20);
 		ft_putstr_fd(bash_line, STDERR_FILENO);
 		ft_putstr_fd(args[0], STDERR_FILENO);
-		msg = ft_strdup(i18n(commandnotfound, get_lang(envp)));
+		msg = ft_strdup(": command not found\n");
 		ft_putstr_fd(msg, STDERR_FILENO);
 		free(msg);
 		exit(127);

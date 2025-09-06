@@ -1,27 +1,36 @@
-NAME = minishell
-CC = gcc
-CFLAGS = -Werror -Wall -Wextra -Wpedantic -Wshadow -Wunused-parameter -Wunused-variable -Wunused-function -Wformat=2 -Wconversion -Wcast-align -Wcast-qual -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wnested-externs
+CC      := gcc
+CFLAGS  := -Werror -Wall -Wextra -Wpedantic -Wshadow -Wunused-parameter -Wunused-variable -Wunused-function -Wformat=2 -Wconversion -Wcast-align -Wcast-qual -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wnested-externs
+CFLAGS  += -I./include
 
-# Readline include/lib paths (42 Homebrew and macOS Homebrew)
-READLINE_INC = -I$(HOME)/.brew/opt/readline/include -I/opt/homebrew/opt/readline/include
-READLINE_LIB = -L$(HOME)/.brew/opt/readline/lib -L/opt/homebrew/opt/readline/lib
+# Readline (portable)
+READLINE_CFLAGS := $(shell pkg-config --cflags readline 2>/dev/null)
+READLINE_LIBS   := $(shell pkg-config --libs   readline 2>/dev/null)
 
-LDFLAGS = $(READLINE_LIB) -lreadline -Llibs/Libft -lft
-CPPFLAGS = -I./include $(READLINE_INC)
+UNAME_S := $(shell uname -s)
+ifeq ($(strip $(READLINE_CFLAGS)),)
+  ifeq ($(UNAME_S),Darwin)
+    READLINE_CFLAGS += -I/opt/homebrew/opt/readline/include
+    READLINE_LIBS   += -L/opt/homebrew/opt/readline/lib -lreadline -lncurses
+  else
+    # Linux fallback if pkg-config missing (Debian/Ubuntu)
+    READLINE_LIBS   += -lreadline -lncurses
+  endif
+endif
 
-# Explicit Homebrew macOS flags (requested)
-CFLAGS += -I/opt/homebrew/opt/readline/include
-# Avoid linking readline twice; only extend the search path here
-LDFLAGS += -L/opt/homebrew/opt/readline/lib
+CFLAGS  += $(READLINE_CFLAGS)
 
-INCLUDE_DIR = ./include
+# Libft
+LIBFT_DIR := libs/Libft
+LIBFT_SRCS := ft_isalpha.c ft_isdigit.c ft_isalnum.c ft_isascii.c ft_isprint.c ft_strlen.c ft_memset.c ft_bzero.c ft_memcpy.c ft_memmove.c ft_strlcpy.c ft_strlcat.c ft_toupper.c ft_tolower.c ft_strchr.c ft_strrchr.c ft_strncmp.c ft_memchr.c ft_memcmp.c ft_strnstr.c ft_atoi.c ft_calloc.c ft_strdup.c ft_substr.c ft_strjoin.c ft_strtrim.c ft_split.c ft_itoa.c ft_strmapi.c ft_striteri.c ft_putchar_fd.c ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c ft_lstnew_bonus.c ft_lstadd_front_bonus.c ft_lstsize_bonus.c ft_lstlast_bonus.c ft_lstadd_back_bonus.c ft_lstdelone_bonus.c ft_lstclear_bonus.c ft_lstiter_bonus.c ft_lstmap_bonus.c
+LIBFT_OBJS := $(addprefix $(LIBFT_DIR)/, $(LIBFT_SRCS:.c=.o))
+LIBFT     := $(LIBFT_DIR)/libft.a
 
-MAIN = env_utils env_helpers file_utils global global_accessors input_utils input_helpers main process_command numeric_utils run_commands strarrutils termios_utils stubs
-CMD = alias alias_helpers cd cd_helpers cd_helpers2 cd_pwd echo env exec exec_error exec_helpers exec_proc exit exit_helpers2 exit_helpers3 export export_helpers export_helpers2 export_helpers3 export2 history pwd unset unset_helpers unset_helpers2 exec_check_utils
-PARSER =  escape_split expand_alias expand_envvar expand_wildcard get_arg_num get_file_list get_length hash_handler is is2 load_lst parser prompt quote_check rm_quotes semicolon_handler semicolon_helpers syntax syntax_helpers syntax_helpers2 syntax_helpers3
-REDIR = argu_cleanup cmd_redir exec_redir redir_helpers utils_redir utils_redir2 utils_redir3
+# Source files (keeping existing structure)
+MAIN = env_utils env_utils2 env_helpers env_helpers2 file_utils global input_utils input_helpers main process_command process_command_helpers numeric_utils strarrutils termios_utils stubs wildcard_stubs signals status memory_validation
+CMD = cd cd_helpers cd_helpers2 cd_pwd echo env exec exec_error exec_helpers exec_proc exit exit_helpers2 exit_helpers3 export export_helpers export_helpers2 export_helpers3 export2 pwd unset unset_helpers unset_helpers2 exec_check_utils
+PARSER =  escape_split expand_envvar get_length hash_handler is is2 is3 is4 parser parser_helpers parser_helpers2 prompt6 prompt_helpers quote_check rm_quotes syntax syntax_helpers syntax_helpers2 syntax_helpers3 syntax_helpers4 wildcard_parser
+REDIR = argu_cleanup cmd_redir exec_redir heredoc_utils redir_helpers right_redir utils_redir utils_redir2 utils_redir3
 PIPE = utils_pipe utils_pipe2 utils_pipe3 utils_pipe4
-
 
 SRCS =	$(addsuffix .c, $(addprefix src/core/, $(MAIN))) \
 		$(addsuffix .c, $(addprefix src/cmd/, $(CMD))) \
@@ -29,30 +38,87 @@ SRCS =	$(addsuffix .c, $(addprefix src/core/, $(MAIN))) \
 		$(addsuffix .c, $(addprefix src/redirection/, $(REDIR))) \
 		$(addsuffix .c, $(addprefix src/pipe/, $(PIPE)))
 
-OBJS = $(SRCS:.c=.o)
+OBJS := $(SRCS:.c=.o)
 
-all : $(NAME)
+# Bonus sources
+BONUS_SRCS := \
+	bonus/src/bonus/split_operators.c \
+	bonus/src/bonus/split_operators_helpers.c \
+	bonus/src/bonus/split_operators_helpers2.c \
+	bonus/src/bonus/subshell.c \
+	bonus/src/bonus/subshell_helpers.c \
+	bonus/src/bonus/wildcard/expand_wildcard.c \
+	bonus/src/bonus/wildcard/expand_wildcard_helpers.c \
+	bonus/src/bonus/wildcard/expand_wildcard_loop.c \
+	bonus/src/bonus/wildcard/expand_wildcard_redir.c \
+	bonus/src/bonus/wildcard/expand_wildcard_utils.c \
+	bonus/src/bonus/wildcard/get_arg_num.c \
+	bonus/src/bonus/wildcard/get_file_list.c \
+	bonus/src/bonus/wildcard/load_lst.c \
+	bonus/src/bonus/wildcard/pattern_matching.c \
+	bonus/src/bonus/wildcard/wildcard_handler.c
 
-$(NAME) : $(OBJS)
-	@make bonus -s -C libs/Libft
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o $(NAME)
+BONUS_OBJS := $(BONUS_SRCS:.c=.o)
 
+# Targets
+NAME := minishell
+BONUS_NAME := minishell_bonus
 
-%.o: %.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
+# Default target
+all: $(NAME)
 
-clean :
-	@make clean -s -C libs/Libft
-	@rm -rf $(OBJS) "|" "<" ">" ">>" .temp asd echo grep la lol minishell.dSYM o out0 out1 tmp_*
+# Mandatory target
+mandatory: $(NAME)
 
-debug : clean
-	@make debug -s -C libs/Libft
-	$(CC) $(CFLAGS) $(CPPFLAGS) -g -fsanitize=address $(LDFLAGS) $(SRCS) -o $(NAME)
+# Bonus target
+bonus: $(BONUS_NAME)
 
-fclean : clean
-	@make fclean -s -C libs/Libft
-	@rm -rf $(NAME)
+# Both targets
+both: $(NAME) $(BONUS_NAME)
 
-re : fclean all
+$(LIBFT): $(LIBFT_OBJS)
+	ar rcs $@ $^
 
-.PHONY : all, clean, debug, fclean, re,
+$(NAME): $(OBJS) $(LIBFT)
+	$(CC) $(OBJS) -L$(LIBFT_DIR) -lft $(READLINE_LIBS) -o $@
+
+$(BONUS_NAME): $(OBJS) src/parser/wildcard_parser_bonus.o $(BONUS_OBJS) $(LIBFT)
+		$(CC) $(filter-out src/core/stubs.o src/core/wildcard_stubs.o src/parser/wildcard_parser.o, $(OBJS)) src/parser/wildcard_parser_bonus.o $(BONUS_OBJS) -L$(LIBFT_DIR) -lft $(READLINE_LIBS) -o $@
+
+src/core/%.o: src/core/%.c
+	$(CC) $(CFLAGS) -I./include -c $< -o $@
+
+src/cmd/%.o: src/cmd/%.c
+	$(CC) $(CFLAGS) -I./include -c $< -o $@
+
+src/parser/%.o: src/parser/%.c
+		$(CC) $(CFLAGS) -I./include -c $< -o $@
+
+# Bonus-compiled variant of wildcard_parser for the bonus binary
+src/parser/wildcard_parser_bonus.o: src/parser/wildcard_parser.c
+		$(CC) $(CFLAGS) -DBUILD_BONUS -I./include -c $< -o $@
+
+src/redirection/%.o: src/redirection/%.c
+	$(CC) $(CFLAGS) -I./include -c $< -o $@
+
+src/pipe/%.o: src/pipe/%.c
+	$(CC) $(CFLAGS) -I./include -c $< -o $@
+
+bonus/%.o: bonus/%.c
+	$(CC) $(CFLAGS) -DBUILD_BONUS -I./include -c $< -o $@
+
+$(LIBFT_DIR)/%.o: $(LIBFT_DIR)/%.c
+	$(CC) -Wall -Wextra -Werror -I$(LIBFT_DIR) -c $< -o $@
+
+clean:
+	rm -f $(OBJS) $(BONUS_OBJS) $(LIBFT_OBJS)
+
+fclean: clean
+	rm -f $(NAME) $(BONUS_NAME) $(LIBFT)
+
+re: fclean all
+
+debug: clean
+	$(CC) $(CFLAGS) -g -fsanitize=address $(SRCS) -L$(LIBFT_DIR) -lft $(READLINE_LIBS) -o $(NAME)
+
+.PHONY: all mandatory bonus both clean fclean re debug

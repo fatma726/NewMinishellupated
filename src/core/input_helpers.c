@@ -10,45 +10,45 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "minishell.h"
 
-static void	process_buffer(char *buffer, int *i)
+static ssize_t	read_until_newline(char *buffer, size_t max)
 {
-	while (1)
+	size_t	i;
+	ssize_t	br;
+
+	i = 0;
+	while (i < max - 1)
 	{
-		if (buffer[*i] == '\n')
+		br = read(STDIN_FILENO, &buffer[i], 1);
+		if (br <= 0)
 			break ;
-		(*i)++;
-		if (*i >= 1023)
+		if (buffer[i] == '\n')
+		{
+			i++;
 			break ;
+		}
+		i++;
 	}
+	return ((ssize_t)i);
 }
 
 char	*read_line_simple(void)
 {
 	char	buffer[1024];
 	char	*line;
-	ssize_t	bytes_read;
-	size_t	i;
+	ssize_t	len;
 
 	line = malloc(1024);
 	if (!line)
 		return (NULL);
-	i = 0;
-	while (1)
+	len = read_until_newline(buffer, sizeof(buffer));
+	if (len <= 0)
 	{
-		bytes_read = read(STDIN_FILENO, &buffer[i], 1);
-		if (bytes_read <= 0)
-			break ;
-		process_buffer(buffer, (int *)&i);
-		if (bytes_read <= 0 && i == 0)
-		{
-			free(line);
-			return (NULL);
-		}
-		break ;
+		free(line);
+		return (NULL);
 	}
-	buffer[i] = '\0';
-	ft_strlcpy(line, buffer, i + 1);
+	buffer[(size_t)len] = '\0';
+	ft_strlcpy(line, buffer, (size_t)len + 1);
 	return (line);
 }

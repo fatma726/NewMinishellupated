@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 static int	left_redir_post(char **args, char **envp, int *i, t_node *node)
 {
@@ -23,6 +23,17 @@ static int	left_redir_post(char **args, char **envp, int *i, t_node *node)
 	args_left_move(args, *i);
 	args_left_move(node->ori_args, *i);
 	*i -= 1;
+	return (0);
+}
+
+static int	handle_heredoc_cleanup(char **args, int *i)
+{
+	while (args[*i + 2])
+	{
+		free(args[*i + 2]);
+		args[*i + 2] = NULL;
+		(*i)++;
+	}
 	return (0);
 }
 
@@ -67,40 +78,9 @@ int	left_double_redir(char **args, char **envp, int *i, t_node *node)
 	if (!node->cmd && args[*i + 2]
 		&& !is_redir_check(node->ori_args[*i + 2])
 		&& !exec_check(args + 2, envp, node))
-		return (print_err2(args, *i));
+		return (handle_heredoc_cleanup(args, i));
 	double_lmove_idx_change(args, i);
 	*i += 1;
 	double_lmove_idx_change(node->ori_args, i);
 	return (unlink(".temp") == -1);
-}
-
-int	right_redir(char **args, int *i, t_node *node)
-{
-	int	fd;
-
-	fd = open_redir_out(args, *i, node, O_WRONLY | O_CREAT | O_TRUNC);
-	if (fd < 0)
-		return (1);
-	node->right_flag = 1;
-	if (args[*i][0] == '2')
-		dup2(fd, STDERR_FILENO);
-	else
-		dup2(fd, STDOUT_FILENO);
-	close(fd);
-	move_redir_args(args, node->ori_args, i);
-	return (*i -= 1, 0);
-}
-
-int	right_double_redir(char **args, int *i, t_node *node)
-{
-	int	fd;
-
-	fd = open_redir_out(args, *i, node, O_WRONLY | O_CREAT | O_APPEND);
-	if (fd < 0)
-		return (1);
-	node->right_flag = 1;
-	dup2(fd, STDOUT_FILENO);
-	close(fd);
-	move_redir_args(args, node->ori_args, i);
-	return (*i -= 1, 0);
 }

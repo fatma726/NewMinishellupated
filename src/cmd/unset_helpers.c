@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 bool	is_valid_identifier(char *str)
 {
@@ -61,7 +61,6 @@ char	**delete_env(char *str, char **envp, t_node *node, int *flag)
 	{
 		if (find_envkey(str, envp[i]))
 		{
-			unsetenv(str);
 			free(envp[i]);
 			envp[i] = envp[last - 1];
 			envp[last - 1] = NULL;
@@ -69,7 +68,6 @@ char	**delete_env(char *str, char **envp, t_node *node, int *flag)
 			return (envp);
 		}
 	}
-	unsetenv(str);
 	*flag = 1;
 	return (envp);
 }

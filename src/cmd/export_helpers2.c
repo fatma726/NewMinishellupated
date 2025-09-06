@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 void	handle_path_update(char *arg, t_node *node)
 {
@@ -23,16 +23,16 @@ char	**handle_env_update(char *arg, char **envp, char *name, int j)
 	char	*tmp;
 
 	if (!ft_getenv(name, envp))
-		return (ft_setenv(name, arg + j + 1, envp));
+		return (ft_setenv_envp(name, arg + j + 1, envp));
 	else if (j > 0 && arg[j - 1] == '+')
 	{
 		tmp = ft_strjoin(ft_getenv(name, envp), arg + j + 1);
-		envp = ft_setenv(name, tmp, envp);
+		envp = ft_setenv_envp(name, tmp, envp);
 		free(tmp);
 		return (envp);
 	}
 	else
-		return (ft_setenv(name, arg + j + 1, envp));
+		return (ft_setenv_envp(name, arg + j + 1, envp));
 }
 
 bool	validate_export_identifier(char *arg)

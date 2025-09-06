@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 static int	getsize(long n)
 {
@@ -45,7 +45,7 @@ static int	handle_envvar(char *str, char **envp, int *i)
 	{
 		while (envp[i[2]][++j])
 			i[5] += (ft_strchr("<>|", envp[i[2]][j]) != 0);
-		i[5] += ft_strlen(envp[i[2]]) - (size_t)(i[1] - i[0] + 1);
+		i[5] += (int)(ft_strlen(envp[i[2]]) - (size_t)(i[1] - i[0] + 1));
 	}
 	i[0] = i[1] - 1;
 	return (0);

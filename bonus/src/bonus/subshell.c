@@ -6,11 +6,12 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/08/29 20:59:16 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/06 22:32:22 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "../../include/bonus.h"
 
 static char	*create_clean_string(char *str, t_node *node, int length)
 {
@@ -81,31 +82,13 @@ static char	*process_parentheses(char *str, t_node *node)
 	int			length;
 
 	if (str && ft_strlen(str) >= 3 && ft_strncmp(str, ">>>", 3) == 0)
-	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `>'\n",
-			STDERR_FILENO);
-		set_exit_status(2);
-		node->syntax_flag = true;
-		return (free(str), NULL);
-	}
+		return (handle_triple_redir_error(str, node));
 	count = validate_parens(str, node, &length);
 	if (count == -1)
 		return (free(str), NULL);
-	if (count == -2)
-	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `",
-			STDERR_FILENO);
-		ft_putendl_fd(")'", STDERR_FILENO);
-		return (free(str), NULL);
-	}
-	if (count != 0)
-	{
-		ft_putstr_fd(
-			"minishell: syntax error near unexpected token `newline'",
-			STDERR_FILENO);
-		ft_putchar_fd('\n', STDERR_FILENO);
-		return (free(str), NULL);
-	}
+	str = handle_paren_error(str, count);
+	if (!str)
+		return (NULL);
 	return (create_clean_string(str, node, length));
 }
 
@@ -116,10 +99,10 @@ char	**subshell(char *str, char **envp, t_node *node)
 		str = process_parentheses(str, node);
 		if (!str)
 			return (NULL);
-		return (semicolon_handler(str, envp, node));
+		return (split_operators(str, envp, node));
 	}
 	str = process_parentheses(str, node);
 	if (!str)
 		return (envp);
-	return (semicolon_handler(str, envp, node));
+	return (split_operators(str, envp, node));
 }

@@ -1,41 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   global_accessors.c                                 :+:      :+:    :+:   */
+/*   is4.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatmtahmdab       #+#    #+#             */
-/*   Updated: 2025/08/30 04:08:22 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/06 17:11:43 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "minishell.h"
 
-int	get_signal_number(void)
+bool	isdp(char *str)
 {
-	extern t_global_state	g_state;
-
-	return (g_state.signal_number);
+	return (str && !ft_strncmp(str, "||", 3));
 }
 
-void	clear_signal_number(void)
+bool	isda(char *str)
 {
-	extern t_global_state	g_state;
-
-	g_state.signal_number = 0;
-}
-
-int	get_exit_status(void)
-{
-	extern t_global_state	g_state;
-
-	return (g_state.exit_status);
-}
-
-void	set_exit_status(int status)
-{
-	extern t_global_state	g_state;
-
-	g_state.exit_status = status;
+	return (str && !ft_strncmp(str, "&&", 3));
 }

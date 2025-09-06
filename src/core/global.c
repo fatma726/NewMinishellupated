@@ -3,40 +3,31 @@
 /*                                                        :::      ::::::::   */
 /*   global.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
+/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/08/30 04:00:14 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/04 09:37:32 by fatima           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "minishell.h"
 #include <signal.h>
-#include <termios.h>
-#include <readline/readline.h>
-#include <readline/history.h>
 
-t_global_state	g_state = {0, 0};
+volatile sig_atomic_t	g_signal = 0;
 
-static void	sigint_handler(int sig)
+int	get_signal_number(void)
 {
-	(void)sig;
-	g_state.signal_number = SIGINT;
-	write(STDOUT_FILENO, "\n", 1);
-	rl_replace_line("", 0);
-	rl_on_new_line();
-	rl_redisplay();
+	return (g_signal);
 }
 
-static void	sigquit_handler(int sig)
+void	clear_signal_number(void)
 {
-	(void)sig;
-	g_state.signal_number = SIGQUIT;
+	g_signal = 0;
 }
 
-void	set_signal(void)
+void	set_signal_number(int sig)
 {
-	set_termios();
-	signal(SIGINT, sigint_handler);
-	signal(SIGQUIT, sigquit_handler);
+	g_signal = sig;
 }
+
+/* exit status functions moved to status.c */

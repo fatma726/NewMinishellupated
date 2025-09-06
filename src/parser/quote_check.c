@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 static int	quote_check_loop(char const *s, int j, int *next, bool *doublequote)
 {

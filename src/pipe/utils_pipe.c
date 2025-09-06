@@ -6,11 +6,11 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 09:20:31 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/08/30 02:10:26 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/06 20:25:54 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 void	exec_child(char **args, char **envp, t_node *node)
 {
@@ -19,6 +19,7 @@ void	exec_child(char **args, char **envp, t_node *node)
 	if (!node->right_flag)
 		dup2(node->fds[1], STDOUT_FILENO);
 	close(node->fds[1]);
+	signal(SIGPIPE, SIG_DFL);
 	if (!node->child_die)
 	{
 		envp = shlvl_mod(1, envp);
@@ -37,7 +38,6 @@ void	exec_parents(char **args, char **envp, t_node *node)
 	node->pipe_flag = 0;
 	envp = repeat(args, envp, node);
 	backup_restor(node);
-	strarrfree(envp);
 }
 
 char	**cloturn(int backup_stdout, int backup_stdin, char **envp)
@@ -75,6 +75,7 @@ void	init_node(t_node *node)
 {
 	node->child_die = 0;
 	node->echo_skip = 0;
+	node->escape_skip = false;
 	node->exit_flag = 1;
 	node->parent_die = 0;
 	node->pipe_flag = 0;

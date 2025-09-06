@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 void	args_left_move_i(char **args, t_node *node)
 {
@@ -67,7 +67,10 @@ int	print_err2(char **args, int i)
 	ft_strlcpy(bash_line, "bash: line 1: ", 20);
 	ft_putstr_fd(bash_line, STDERR_FILENO);
 	errno = ENOENT;
-	perror(args[i + 2]);
+	ft_putstr_fd(args[i + 2], STDERR_FILENO);
+	ft_putstr_fd(": ", STDERR_FILENO);
+	ft_putstr_fd(strerror(errno), STDERR_FILENO);
+	ft_putstr_fd("\n", STDERR_FILENO);
 	return (1);
 }
 

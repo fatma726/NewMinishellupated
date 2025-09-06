@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "minishell.h"
 
 static bool	is_blank(const char *s)
 {
@@ -93,13 +93,17 @@ char	**process_command(char *line, char **envp, t_node *n)
 {
 	char	*expanded;
 	char	*hashed;
+	char	**result;
 
-	init_node(n);
-	n->argmode = false;
 	if (!line || is_blank(line))
 		return (free(line), envp);
+	init_node(n);
+	n->argmode = false;
 	n->escape_skip = !ft_strchr(line, '\'') && !ft_strchr(line, '"')
 		&& !ft_strchr(line, '\\');
+	result = check_braces(line, envp, n);
+	if (result)
+		return (result);
 	expanded = escape_handler(line, n);
 	hashed = hash_handler(expanded, n);
 	envp = dispatch_line(hashed, envp, n);

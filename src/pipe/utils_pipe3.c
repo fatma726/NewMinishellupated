@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 static bool	has_non_redir_token(char **args)
 {
@@ -37,13 +37,17 @@ static bool	has_non_redir_token(char **args)
 
 char	**one_commnad(char **args, char **envp, t_node *node)
 {
+	int	redir_ret;
+
+	redir_ret = 0;
 	if (redir_chk(node->ori_args))
-		(void)exec_redir(args, envp, node);
-	if (!has_non_redir_token(args))
-	{
-		set_exit_status(0);
-		return (envp);
-	}
+		redir_ret = exec_redir(args, envp, node);
+    if (!has_non_redir_token(args))
+    {
+        if (redir_ret == 0 && get_exit_status() == 0)
+            set_exit_status(0);
+        return (envp);
+    }
 	envp = find_command(args, envp, node);
 	if (node->redir_flag)
 		backup_restor(node);

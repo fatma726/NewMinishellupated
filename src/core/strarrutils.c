@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "minishell.h"
 
 char	**strarradd(char **arr, char *str)
 {
@@ -56,6 +56,33 @@ char	**strarrdup(char **strs)
 	}
 	newstrs[i] = 0;
 	return (newstrs);
+}
+
+char	**strarradd_take(char **arr, char *owned)
+{
+	size_t	n;
+	char	**newarr;
+	size_t	i;
+
+	n = 0;
+	while (arr && arr[n])
+		n++;
+	newarr = malloc(sizeof(char *) * (n + 2));
+	if (!newarr)
+	{
+		free(owned);
+		return (NULL);
+	}
+	i = 0;
+	while (i < n)
+	{
+		newarr[i] = arr[i];
+		i++;
+	}
+	newarr[n] = owned;
+	newarr[n + 1] = NULL;
+	free(arr);
+	return (newarr);
 }
 
 void	strarrfree(char **strs)

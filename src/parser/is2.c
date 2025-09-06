@@ -10,40 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 bool	isrr(char *str)
 {
 	return (str && (!ft_strncmp(str, ">", 2) || !ft_strncmp(str, "2>", 3)
 			|| !ft_strncmp(str, ">|", 3) || !ft_strncmp(str, "2>|", 4)));
-}
-
-bool	istlr(char *str)
-{
-	return (str && !ft_strncmp(str, "<<<", 4));
-}
-
-bool	isdlr(char *str)
-{
-	return (str && !ft_strncmp(str, "<<", 3));
-}
-
-bool	isdrr(char *str)
-{
-	return (str && !ft_strncmp(str, ">>", 3));
-}
-
-bool	islrr(char *str)
-{
-	return (str && !ft_strncmp(str, "<>", 3));
-}
-
-bool	isdp(char *str)
-{
-	return (str && !ft_strncmp(str, "||", 3));
-}
-
-bool	isda(char *str)
-{
-	return (str && !ft_strncmp(str, "&&", 3));
 }

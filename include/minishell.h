@@ -6,14 +6,14 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/03 18:41:42 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/06 21:12:02 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# define MSTEST_MODE 0
+# define MSTEST_MODE 1
 
 /* includes */
 # include <dirent.h>
@@ -28,6 +28,7 @@
 # include <stdlib.h>
 # include <string.h>
 # include <sys/stat.h>
+# include <sys/wait.h>
 # include <termios.h>
 # include <unistd.h>
 # include "../libs/Libft/libft.h"
@@ -55,16 +56,11 @@ typedef enum e_message
 	toomanyarguments
 }	t_message;
 
-typedef enum e_language
-{
-	english,
-	french
-}	t_language;
+// Removed internationalization - not required for evaluation
 
 /* structs */
 typedef struct s_node
 {
-	char	**aliases;
 	bool	argmode;
 	int		backup_stdin;
 	int		backup_stdout;
@@ -96,13 +92,23 @@ typedef struct s_node
 	bool	syntax_flag;
 }	t_node;
 
+typedef struct s_prompt_data
+{
+	char	**fmt;
+	char	*new_fmt;
+	int		j;
+	char	*user;
+	char	*pwd;
+}	t_prompt_data;
+
 /* global state access */
 int				get_signal_number(void);
 void			clear_signal_number(void);
+void			set_signal_number(int sig);
 int				get_exit_status(void);
 void			set_exit_status(int status);
 
-/* bonus */
+/* bonus hooks (provided by stubs in mandatory build) */
 char			**split_operators(char *s, char **envp, t_node *n);
 char			**subshell(char *str, char **envp, t_node *node);
 
@@ -116,18 +122,18 @@ char			*find_lowest_alias(char **aliases, char *lowest_old,
 					unsigned int i2);
 char			**cmd_cd(char **args, char **envp, t_node *node);
 bool			check_arg_count_with_slash(char **args, char **envp,
-					bool offset);
+					int offset);
 bool			check_arg_count_without_slash(char **args, char **envp,
-					bool offset);
-bool			check_argument_count(char **args, char **envp, bool offset);
-bool			handle_home_cd(char **args, char **envp, bool offset);
+					int offset);
+bool			check_argument_count(char **args, char **envp, int offset);
+bool			handle_home_cd(char **args, char **envp, int offset);
 bool			handle_oldpwd_cd(char **args, char **envp, t_node *node,
-					bool offset);
-bool			handle_chdir_error(char **args, bool offset);
+					int offset);
+bool			handle_chdir_error(char **args, int offset);
 bool			checks2(char **args, char **envp, t_node *node,
-					bool offset);
+					int offset);
 bool			checks(char **args, char **envp, t_node *node,
-					bool offset);
+					int offset);
 void			cmd_echo(char **args, t_node *node);
 char			**cmd_env(char **args, char **envs, t_node *node);
 char			**cmd_exec(char **args, char **envp, t_node *node);
@@ -182,7 +188,9 @@ long			ft_atol(const char *str);
 long long		ft_atoll(const char *str);
 bool			ft_isalldigit(char *str);
 char			*ft_getenv(const char *name, char **envp);
-char			**ft_setenv(const char *name, const char *value,
+int				ft_setenv_var(const char *name, const char *value,
+					int overwrite);
+char			**ft_setenv_envp(const char *name, const char *value,
 					char **envp);
 char			*newpwd(t_node *node, char **envp);
 void			printenv(char *str);
@@ -190,24 +198,44 @@ char			*curdir(char **envp);
 char			*get_curdir(void);
 
 /* main */
-t_language		get_lang(char **envp);
+// Removed internationalization - not required for evaluation
 char			*get_line(char *str);
 char			**get_file(int fd);
 char			*read_line_simple(void);
-const char		*i18n(t_message arg, t_language language);
+// Removed internationalization - not required for evaluation
 void			argmode(char *line, char *arg, char **envp, t_node *node);
-char			**run_commands(char **envp, t_node *node);
+// Removed run_commands - not required for evaluation
 void			set_signal(void);
 void			set_termios(void);
 void			restore_termios(void);
 char			**setpwd(t_node *node, char **envp);
 char			**shlvl_mod(int mod, char **envp);
+
+# ifdef BUILD_BONUS
+// Bonus wildcard functions
+char			**expand_wildcard(char **args, char **envp, t_node *node);
+char			**get_file_list(bool hidden);
+int				get_arg_num(char **args, t_node *node);
+char			**load_lst(struct dirent *dr, DIR *dir, bool hidden);
+char			*expand_wildcard_redir(char *pattern, t_node *node);
+# endif
+
 char			**shlvl_plus_plus(char **envp);
 char			**strarradd(char **strs, char *str);
+char			**strarradd_take(char **arr, char *owned);
 char			**strarrdup(char **strs);
 void			strarrfree(char **strs);
+
+# ifdef DEBUG_MEMORY
+
+bool			validate_env_array(char **envp);
+size_t			count_env_vars(char **envp);
+void			debug_print_env(char **envp, const char *label);
+# endif
+
 size_t			strarrlen(char **strs);
 char			**process_command(char *line, char **envp, t_node *n);
+char			**check_braces(char *line, char **envp, t_node *n);
 char			**get_prompt(char **envp, t_node *n);
 
 /* parser */
@@ -219,7 +247,17 @@ char			*get_command(char *str, int i, int offset, t_node *node);
 char			*expand_envvar(char *str, char **envp, t_node *node);
 char			*expand_prompt(char *fmt, char **envp, t_node *node);
 char			**expand_wildcard(char **args, char **envp, t_node *node);
+char			**expand_wildcard_if_bonus(char **args, char **envp,
+					t_node *node);
 char			*expand_wildcard_redir(char *pattern, t_node *node);
+void			expand_wildcard_loop(char **args, char **newargs, char **envp,
+					t_node *node);
+void			failcheck(char **files, int *i, char **newargs, char **args);
+bool			wildcard_loop(char **files, int *i, char **newargs,
+					char **args);
+void			wildcard_handler(char **args, char **newargs, int *i,
+					t_node *node);
+char			*add_spaces_around_ampersand(char *str, t_node *node);
 char			**find_command(char **args, char **envp, t_node *node);
 int				get_arg_num(char **args, t_node *node);
 char			**get_file_list(bool hidden);
@@ -243,13 +281,13 @@ char			**parser(char *str, char **envp, t_node *node);
 int				quote_check(char const *s, int i, t_node *node);
 char			**rm_quotes(char **args, t_node *node);
 char			**rm_quotes_wildcards(char **args, t_node *node);
-char			**semicolon_handler(char *str, char **envp, t_node *node);
 bool			syntax_check(char **args, char **envp, t_node *node);
 void			tilde_handler(char **args, int *i, char **envp);
 
 /* syntax helpers */
 const char		*check_leading_operators(char **args);
 const char		*check_consecutive_ops(char **args, int i);
+const char		*check_invalid_operator_sequences(char **args, int i);
 const char		*check_triple_redir_split(char **args, int i);
 bool			check_leading_operators_syntax(char **a);
 bool			check_consecutive_operators_syntax(char **a);
@@ -258,10 +296,9 @@ bool			check_trailing_operators_syntax(char **a);
 const char		*get_error_token(char **args);
 bool			c(char **args, int i, bool (*f1)(char *), bool (*f2)(char *));
 void			handle_syntax_error(char **envp, t_node *node);
-bool			semicolon_syntax_check(char **split, char **envp, t_node *node);
 bool			check_invalid_operator_sequences_in_string(char *s, t_node *n);
-char			**process_semicolon_commands(char **split, char **envp,
-				t_node *node);
+bool			handle_redirect_ampersand(char *str, t_node *node);
+char			**dispatch_builtin(char **args, char **envp, t_node *node);
 
 /* pipe */
 int				prepare_redirections(char **args, char **envp, t_node *node);
@@ -270,6 +307,7 @@ void			backup_restor(t_node *node);
 char			**cloturn(int backup_stdout, int backup_stdin, char **envp);
 void			exec_child(char **args, char **envp, t_node *node);
 void			exec_parents(char **args, char **envp, t_node *node);
+void			run_parent_segment(char **args, char **envp, t_node *node);
 char			**execute(char **args, char **envp, t_node *node);
 void			init_node(t_node *node);
 char			**one_commnad(char **args, char **envp, t_node *node);
@@ -310,10 +348,16 @@ bool			is_left_redir(char *str);
 bool			is_right_redir(char *str);
 bool			is_double_left_redir(char *str);
 bool			is_double_right_redir(char *str);
-void			argu_left_change(char **args, t_node *node);
 int				left_redir_expand(char **args, int i, t_node *node,
 					char **expanded);
 void			handle_echo_skip(char **args, t_node *node);
 int				open_redir_out(char **args, int i, t_node *node, int flags);
+
+/* prompt helpers */
+int				handle_escape_char(t_prompt_data *data);
+void			handle_pwd_path(char **pwd, char **envp);
+char			*expand_loop(char *fmt, char *new_fmt, char *user, char *pwd);
+int				promptlen(char *fmt, char **envp, char *pwd, int i);
+char			*get_pwd_for_prompt(char **envp, t_node *node);
 
 #endif

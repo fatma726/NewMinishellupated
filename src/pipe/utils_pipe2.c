@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   utils_pipe2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
+/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 09:20:31 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/03 10:08:02 by fatima           ###   ########.fr       */
+/*   Updated: 2025/09/06 22:33:47 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 void	backup_restor(t_node *node)
 {
@@ -44,20 +44,14 @@ char	**split_before_pipe_args(char **args, t_node *node)
 
 static void	repeat_exec(char **args, char **envp, t_node *node, int pid)
 {
-	char	**new_ori_args;
+    int		status;
 
-	if (!pid)
-		exec_child(args, envp, node);
-	else
-	{
-		backup_restor(node);
-		new_ori_args = strarrdup(node->ori_args + node->pipe_idx);
-		strarrfree(node->ori_args);
-		node->ori_args = new_ori_args;
-		exec_parents(strarrdup(args + node->pipe_idx), strarrdup(envp), node);
-	}
-	backup_restor(node);
-	waitpid(pid, 0, 0);
+    if (!pid)
+        exec_child(args, envp, node);
+    else
+        run_parent_segment(args, envp, node);
+    backup_restor(node);
+    waitpid(pid, &status, 0);
 }
 
 /* moved helpers to utils_pipe4.c */

@@ -6,13 +6,13 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/08/30 10:15:58 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/06 15:16:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
-bool	handle_oldpwd_cd(char **args, char **envp, t_node *node, bool offset)
+bool	handle_oldpwd_cd(char **args, char **envp, t_node *node, int offset)
 {
 	char	*oldpwd;
 	char	*cwd;
@@ -38,7 +38,7 @@ bool	handle_oldpwd_cd(char **args, char **envp, t_node *node, bool offset)
 	return (false);
 }
 
-bool	handle_chdir_error(char **args, bool offset)
+bool	handle_chdir_error(char **args, int offset)
 {
 	char	chdir_error[50];
 
@@ -72,7 +72,7 @@ static bool	update_pwd(char *path, t_node *node)
 	return (false);
 }
 
-bool	checks(char **args, char **envp, t_node *node, bool offset)
+bool	checks(char **args, char **envp, t_node *node, int offset)
 {
 	char	*path;
 	int		chdir_result;

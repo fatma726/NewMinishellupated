@@ -6,11 +6,11 @@
 /*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatmtahmdab       #+#    #+#             */
-/*   Updated: 2025/09/03 09:01:11 by fatima           ###   ########.fr       */
+/*   Updated: 2025/09/04 09:23:18 by fatima           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 const char	*check_leading_operators(char **args)
 {

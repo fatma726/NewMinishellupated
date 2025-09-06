@@ -6,11 +6,11 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/08/30 10:12:15 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/06 01:11:28 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 static void	handle_cd_arguments(char **args, char **envp, t_node *node,
 			bool offset)
@@ -40,7 +40,7 @@ static void	handle_cd_arguments(char **args, char **envp, t_node *node,
 
 char	**cmd_cd(char **args, char **envp, t_node *node)
 {
-	bool	offset;
+	int		offset;
 	char	*old_pwd;
 
 	set_exit_status(EXIT_SUCCESS);
@@ -50,7 +50,7 @@ char	**cmd_cd(char **args, char **envp, t_node *node)
 	if (args[1] && !ft_strncmp(args[1], "--", 3))
 		offset++;
 	if (args[1 + offset] && !args[1 + offset][0] && !args[2 + offset])
-		return (ft_setenv("OLDPWD", ft_getenv("PWD", envp), envp));
+		return (ft_setenv_envp("OLDPWD", ft_getenv("PWD", envp), envp));
 	old_pwd = ft_strdup(ft_getenv("PWD", envp));
 	if (checks(args, envp, node, offset))
 	{
@@ -58,8 +58,8 @@ char	**cmd_cd(char **args, char **envp, t_node *node)
 		return (envp);
 	}
 	handle_cd_arguments(args, envp, node, offset);
-	envp = ft_setenv("OLDPWD", old_pwd, envp);
-	envp = ft_setenv("PWD", node->pwd, envp);
+	envp = ft_setenv_envp("OLDPWD", old_pwd, envp);
+	envp = ft_setenv_envp("PWD", node->pwd, envp);
 	free(old_pwd);
 	return (envp);
 }

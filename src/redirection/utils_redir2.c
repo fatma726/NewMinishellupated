@@ -3,22 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   utils_redir2.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
+/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/08/28 16:23:02 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/04 10:40:46 by fatima           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 int	print_err(char **args, int i, t_node *node)
 {
-	char	bash_line[20];
-
-	ft_strlcpy(bash_line, "minishell: ", 20);
-	ft_putstr_fd(bash_line, STDERR_FILENO);
-	perror(args[i + 1]);
+	(void)args;
+	(void)i;
+	ft_putchar_fd(' ', STDERR_FILENO);
+	ft_putendl_fd(strerror(errno), STDERR_FILENO);
 	set_exit_status(1);
 	node->parent_die = 1;
 	if (pipe_check(args, node))

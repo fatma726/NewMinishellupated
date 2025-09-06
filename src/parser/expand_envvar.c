@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 static void	insert_int(char *str, int *i)
 {
@@ -20,7 +20,7 @@ static void	insert_int(char *str, int *i)
 	while (j)
 	{
 		if (get_exit_status() / j)
-			str[i[1]++] = get_exit_status() / j % 10 + '0';
+			str[i[1]++] = (char)(get_exit_status() / j % 10 + '0');
 		j /= 10;
 	}
 	if (!get_exit_status())

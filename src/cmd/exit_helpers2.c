@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 static bool	check_overflow_limits(char *arg)
 {
@@ -46,9 +46,11 @@ void	handle_exit_with_args(char **args)
 void	cleanup_and_exit(char **args, char **envp, t_node *node)
 {
 	free(node->pwd);
+	if (node->path_fallback)
+		free(node->path_fallback);
 	strarrfree(args);
 	strarrfree(envp);
-	clear_history();
+	rl_clear_history();
 	restore_termios();
 	exit(get_exit_status());
 }

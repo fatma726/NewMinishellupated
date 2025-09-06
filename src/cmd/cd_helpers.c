@@ -10,16 +10,17 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
-bool	check_arg_count_with_slash(char **args, char **envp, bool offset)
+bool	check_arg_count_with_slash(char **args, char **envp, int offset)
 {
 	char	*msg;
 
-	if (strarrlen(args) > 4 + offset)
+	(void)envp;
+	if (strarrlen(args) > 4 + (size_t)offset)
 	{
 		set_exit_status(EXIT_FAILURE);
-		msg = ft_strdup(i18n(toomanyarguments, get_lang(envp)));
+		msg = ft_strdup(": too many arguments\n");
 		ft_putstr_fd(msg, STDERR_FILENO);
 		free(msg);
 		return (true);
@@ -27,14 +28,15 @@ bool	check_arg_count_with_slash(char **args, char **envp, bool offset)
 	return (false);
 }
 
-bool	check_arg_count_without_slash(char **args, char **envp, bool offset)
+bool	check_arg_count_without_slash(char **args, char **envp, int offset)
 {
 	char	*msg;
 
-	if (strarrlen(args) > 3 + offset)
+	(void)envp;
+	if (strarrlen(args) > 3 + (size_t)offset)
 	{
 		set_exit_status(EXIT_FAILURE);
-		msg = ft_strdup(i18n(toomanyarguments, get_lang(envp)));
+		msg = ft_strdup(": too many arguments\n");
 		ft_putstr_fd(msg, STDERR_FILENO);
 		free(msg);
 		return (true);
@@ -42,7 +44,7 @@ bool	check_arg_count_without_slash(char **args, char **envp, bool offset)
 	return (false);
 }
 
-bool	check_argument_count(char **args, char **envp, bool offset)
+bool	check_argument_count(char **args, char **envp, int offset)
 {
 	if (args[1 + offset] && !ft_strncmp(args[1 + offset], "/", 1))
 		return (check_arg_count_with_slash(args, envp, offset));
@@ -50,7 +52,7 @@ bool	check_argument_count(char **args, char **envp, bool offset)
 		return (check_arg_count_without_slash(args, envp, offset));
 }
 
-bool	handle_home_cd(char **args, char **envp, bool offset)
+bool	handle_home_cd(char **args, char **envp, int offset)
 {
 	char	home_error[30];
 

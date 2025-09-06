@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 static void	cmd_launch(char **args, char **envs, t_node *node)
 {
@@ -21,7 +21,7 @@ static void	cmd_launch(char **args, char **envs, t_node *node)
 	{
 		envp = malloc(sizeof(char *));
 		envp[0] = NULL;
-		envp = ft_setenv("PATH", ft_getenv("PATH", envs), envp);
+		envp = ft_setenv_envp("PATH", ft_getenv("PATH", envs), envp);
 		args_new = strarrdup(args + 2);
 		envp = find_command(args_new, envp, node);
 		strarrfree(args_new);
@@ -42,7 +42,10 @@ static void	env_error(char *arg)
 	errno = ENOENT;
 	ft_strlcpy(error_msg, "minishell: ", 15);
 	ft_putstr_fd(error_msg, STDERR_FILENO);
-	perror(arg);
+	ft_putstr_fd(arg, STDERR_FILENO);
+	ft_putstr_fd(": ", STDERR_FILENO);
+	ft_putstr_fd(strerror(errno), STDERR_FILENO);
+	ft_putstr_fd("\n", STDERR_FILENO);
 	set_exit_status(127);
 }
 
@@ -59,7 +62,7 @@ static char	**path_check_loop(char **paths, char **args, char **envp, size_t i)
 	if (!access(path, X_OK))
 	{
 		strarrfree(paths);
-		envp = ft_setenv("_", path, envp);
+		envp = ft_setenv_envp("_", path, envp);
 		free(path);
 		return (envp);
 	}
@@ -106,7 +109,7 @@ char	**cmd_env(char **args, char **envs, t_node *node)
 		while (envs[++i])
 			if (ft_strchr(envs[i], '='))
 				ft_putendl_fd(envs[i], STDOUT_FILENO);
-		envs = ft_setenv("_", "env", envs);
+		envs = ft_setenv_envp("_", "env", envs);
 		set_exit_status(EXIT_SUCCESS);
 	}
 	if (node->argmode)

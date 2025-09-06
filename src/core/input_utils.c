@@ -10,15 +10,17 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "minishell.h"
 
 char	*get_line(char *str)
 {
 	char	*line;
 	char	*line2;
 
-	if (!MSTEST_MODE || isatty(STDIN_FILENO))
+	if (isatty(STDIN_FILENO))
 		line = readline(str);
+	else if (MSTEST_MODE)
+		line = readline("minishell$ ");
 	else
 	{
 		line2 = read_line_simple();
@@ -61,6 +63,5 @@ void	argmode(char *line, char *arg, char **envp, t_node *node)
 		envp = subshell(hash_handler(ft_strdup(arg), node), envp, node);
 	else
 		free(line);
-	strarrfree(envp);
-	exit(get_exit_status());
+	cleanup_and_exit(NULL, envp, node);
 }

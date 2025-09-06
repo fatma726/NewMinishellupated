@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 static int	is_n_option(char *str)
 {
@@ -48,5 +48,6 @@ void	cmd_echo(char **args, t_node *node)
 	}
 	if (new_line && !node->echo_skip)
 		ft_putchar_fd('\n', STDOUT_FILENO);
+	fflush(stdout);
 	set_exit_status(EXIT_SUCCESS);
 }

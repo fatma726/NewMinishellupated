@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
 void	exec_nopath(t_node *node, char **args, char **envp, char **paths)
 {
@@ -19,13 +19,14 @@ void	exec_nopath(t_node *node, char **args, char **envp, char **paths)
 
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
+	signal(SIGPIPE, SIG_DFL);
 	test = ft_strjoin(node->pwd, "/");
 	test2 = ft_strjoin(test, args[0]);
 	free(test);
 	if (!access(test2, X_OK))
 	{
 		free(test2);
-		envp = ft_setenv("_", args[0], envp);
+		envp = ft_setenv_envp("_", args[0], envp);
 		execve(args[0], args, envp);
 	}
 	free(test2);
@@ -38,7 +39,8 @@ char	**exec_pipe(char *path, char **args, char **envp, t_node *node)
 
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
-	envp = ft_setenv("_", path, envp);
+	signal(SIGPIPE, SIG_DFL);
+	envp = ft_setenv_envp("_", path, envp);
 	if (node->pipe_flag)
 	{
 		temp = split_before_pipe_args(args, node);
@@ -62,10 +64,16 @@ void	exec_proc_loop2(char **paths, char **args, char **envp, t_node *node)
 		exec_pipe(node->path, args, envp, node);
 	}
 	temp = malloc(2 * sizeof(char *));
+	if (!temp)
+	{
+		free(node->path);
+		return ;
+	}
 	temp[0] = node->path;
 	temp[1] = 0;
 	chkdir(temp, envp, 0);
 	free(node->path);
+	free(temp);
 }
 
 void	exec_proc_loop(char **paths, char **args, char **envp, t_node *node)
@@ -88,16 +96,27 @@ void	exec_proc_loop(char **paths, char **args, char **envp, t_node *node)
 
 void	post_wait_set_status(int pid, int background)
 {
-	int	status;
+    int	status;
 
-	if (background)
-	{
-		set_exit_status(0);
-		return ;
-	}
-	waitpid(pid, &status, 0);
-	if (status == 2 || status == 3)
-		set_exit_status(128 + status);
-	else
-		set_exit_status(status / 256);
+    if (background)
+    {
+        set_exit_status(0);
+        return ;
+    }
+    waitpid(pid, &status, 0);
+    if (WIFSIGNALED(status))
+    {
+        int sig = WTERMSIG(status);
+        if (sig == SIGPIPE)
+            ft_putstr_fd(" Broken pipe\n", STDERR_FILENO);
+        set_exit_status(128 + sig);
+    }
+    else if (WIFEXITED(status))
+    {
+        set_exit_status(WEXITSTATUS(status));
+    }
+    else
+    {
+        set_exit_status(0);
+    }
 }

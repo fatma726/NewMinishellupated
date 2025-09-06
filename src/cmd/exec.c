@@ -10,38 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 
-static int	parse_background(char ***pargs)
-{
-	char	**args;
-	int		last;
+// Removed background processing - not required for evaluation
 
-	args = *pargs;
-	if (!args)
-		return (0);
-	last = 0;
-	while (args[last])
-		last++;
-	if (last > 0 && is_ampersand(args[last - 1]))
-	{
-		args[last - 1] = NULL;
-		return (1);
-	}
-	if (args[0] && is_ampersand(args[0]))
-	{
-		*pargs = args + 1;
-		return (1);
-	}
-	return (0);
-}
-
-static char	**maybe_adjust_shlvl(char **envp, int argmode, int delta)
-{
-	if (argmode)
-		return (shlvl_mod(delta, envp));
-	return (envp);
-}
+// Removed SHLVL adjustment - not required for evaluation
 
 static bool	is_builtin_command(char **args)
 {
@@ -74,14 +47,10 @@ bool	exec_check(char **args, char **envp, t_node *node)
 char	**cmd_exec(char **args, char **envp, t_node *node)
 {
 	int	pid;
-	int	background;
 
-	background = parse_background(&args);
-	envp = maybe_adjust_shlvl(envp, node->argmode, -1);
 	pid = fork();
 	if (!pid)
 		exec_proc(args, envp, node);
-	post_wait_set_status(pid, background);
-	envp = maybe_adjust_shlvl(envp, node->argmode, 1);
+	post_wait_set_status(pid, 0);
 	return (envp);
 }

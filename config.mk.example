@@ -1,0 +1,6 @@
+## Optional local overrides for readline flags
+# Copy this file to `config.mk` and adjust paths for your system.
+
+#READLINE_CFLAGS = -I/opt/homebrew/opt/readline/include
+#READLINE_LIBS   = -L/opt/homebrew/opt/readline/lib -lreadline -lncurses
+

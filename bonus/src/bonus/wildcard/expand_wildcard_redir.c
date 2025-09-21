@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   expand_wildcard_redir.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
+/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/04 10:06:27 by fatima           ###   ########.fr       */
+/*   Updated: 2025/09/20 19:07:27 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../../include/bonus.h"
 
 static void	process_file_matches(char **files, int *match_count, char **result)
 {
@@ -36,21 +36,18 @@ static void	process_file_matches(char **files, int *match_count, char **result)
 
 static char	**prepare_files_for_pattern(char *pattern, t_node *node)
 {
-	char		charset[2];
-	char		**split;
 	char		**files;
 	int			i;
 
-	charset[0] = '*';
-	charset[1] = '\0';
-	split = escape_split(ft_strdup(pattern), charset, node);
-	split = rm_quotes_wildcards(split, node);
-	files = get_file_list(split && split[0] && split[0][0] == '.'
+	(void)node;
+	files = get_file_list(pattern[0] == '.'
 			&& ft_strchr(pattern, '.') < ft_strchr(pattern, '*'));
 	i = -1;
 	while (files[++i])
-		match(pattern, split, files, i);
-	strarrfree(split);
+	{
+		if (!matches_pattern(files[i], pattern))
+			files[i][0] = '\0';
+	}
 	return (files);
 }
 

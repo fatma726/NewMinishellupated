@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   prompt_helpers.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
+/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/09/06 17:15:00 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/11 19:44:47 by fatima           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,10 @@ int	handle_escape_char(t_prompt_data *data)
 {
 	if (*(++(*data->fmt)) == '$')
 	{
-		if (ft_strncmp(data->user, "root", 5) || !data->user)
-			data->new_fmt[data->j++] = '#';
-		else
+		if (!data->user || ft_strncmp(data->user, "root", 5) != 0)
 			data->new_fmt[data->j++] = '$';
+		else
+			data->new_fmt[data->j++] = '#';
 	}
 	else if (**data->fmt == 'W')
 		data->j += (int)ft_strlcpy(data->new_fmt + data->j, data->pwd,

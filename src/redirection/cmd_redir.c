@@ -56,7 +56,10 @@ int	left_redir(char **args, char **envp, int *i, t_node *node)
 	handle_echo_skip(args, node);
 	dup2(fd, STDIN_FILENO);
 	if (left_redir_post(args, envp, i, node))
+	{
+		close(fd);
 		return (1);
+	}
 	return (close(fd), 0);
 }
 

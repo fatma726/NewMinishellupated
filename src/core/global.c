@@ -3,31 +3,34 @@
 /*                                                        :::      ::::::::   */
 /*   global.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
+/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/04 09:37:32 by fatima           ###   ########.fr       */
+/*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
+/*   Updated: 2025/09/20 13:30:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include <signal.h>
 
-volatile sig_atomic_t	g_signal = 0;
+static sig_atomic_t	*signal_slot(void)
+{
+	static sig_atomic_t	value = 0;
+
+	return (&value);
+}
 
 int	get_signal_number(void)
 {
-	return (g_signal);
+	return (*signal_slot());
 }
 
 void	clear_signal_number(void)
 {
-	g_signal = 0;
+	*signal_slot() = 0;
 }
 
 void	set_signal_number(int sig)
 {
-	g_signal = sig;
+	*signal_slot() = sig;
 }
-
-/* exit status functions moved to status.c */

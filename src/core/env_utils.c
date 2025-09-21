@@ -44,9 +44,14 @@ static char	**handle_pwd_change(t_node *node, char **envp, char *curdir[2])
 char	**setpwd(t_node *node, char **envp)
 {
 	char	*curdir[2];
+	char	*pwd_env;
 
 	curdir[0] = getcwd(0, 0);
-	node->pwd = ft_strdup(ft_getenv("PWD", envp));
+	pwd_env = ft_getenv("PWD", envp);
+	if (pwd_env)
+		node->pwd = ft_strdup(pwd_env);
+	else
+		node->pwd = NULL;
 	if (!node->pwd || chdir(node->pwd) == -1)
 		return (handle_pwd_error(node, envp, curdir[0]));
 	curdir[1] = getcwd(0, 0);
@@ -67,4 +72,19 @@ char	**shlvl_mod(int mod, char **envp)
 	envp = ft_setenv_envp("SHLVL", tmp, envp);
 	free(tmp);
 	return (envp);
+}
+
+char	*ft_getenv(const char *name, char **envp)
+{
+	int		i;
+	size_t	len;
+
+	i = 0;
+	len = ft_strlen(name);
+	while (envp[i] && (ft_strncmp(envp[i], name, len)
+			|| (envp[i][len] != '=' && envp[i][len] != '\0')))
+		i++;
+	if (!envp[i] || !ft_strchr(envp[i], '='))
+		return (NULL);
+	return (envp[i] + len + 1);
 }

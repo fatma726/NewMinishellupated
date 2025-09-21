@@ -6,17 +6,49 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/05 23:25:54 by fatmtahmdab       #+#    #+#             */
-/*   Updated: 2025/09/06 19:40:00 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/21 15:07:09 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../include/bonus.h"
+#include "../../../../include/minishell.h"
 
-static int	process_directory_entry(struct dirent *dr, char *pattern)
+int	process_directory_entry(struct dirent *dr, char *pattern)
 {
-	if (dr->d_name[0] == '.')
+	if (dr->d_name[0] == '.' && pattern[0] != '.')
 		return (0);
 	return (matches_pattern(dr->d_name, pattern));
+}
+
+/*
+** We mark arguments that originate from wildcard expansion so that
+** later quote-stripping does NOT remove literal quote characters
+** inside actual filenames (e.g., files named " or '). We prefix
+** the argument with WILDMARK and strip it in rm_quotes.c without
+** altering the content.
+*/
+int	add_matching_file(char **newargs, int *j, char *filename)
+{
+	size_t	len;
+	char	*marked;
+
+	len = ft_strlen(filename);
+	marked = (char *)malloc(len + 2);
+	if (!marked)
+		return (0);
+	marked[0] = (char)WILDMARK;
+	ft_memcpy(marked + 1, filename, len + 1);
+	newargs[*j] = marked;
+	(*j)++;
+	return (1);
+}
+
+void	cleanup_matches(char **matches, int i, DIR *dir)
+{
+	while (i > 0)
+		free(matches[--i]);
+	free(matches);
+	closedir(dir);
 }
 
 int	count_matching_files(char *pattern)
@@ -40,39 +72,22 @@ int	count_matching_files(char *pattern)
 	return (count);
 }
 
-static int	add_matching_file(char **newargs, int *j, char *filename)
-{
-	newargs[*j] = ft_strdup(filename);
-	if (!newargs[*j])
-		return (0);
-	(*j)++;
-	return (1);
-}
-
 int	expand_pattern(char **newargs, int *j, char *pattern)
 {
-	DIR				*dir;
-	struct dirent	*dr;
-	int				count;
+	int		count;
+	char	**matches;
 
-	dir = opendir(".");
-	if (!dir)
+	count = count_matching_files(pattern);
+	if (count == 0)
 		return (0);
-	count = 0;
-	dr = readdir(dir);
-	while (dr != NULL)
-	{
-		if (process_directory_entry(dr, pattern))
-		{
-			if (!add_matching_file(newargs, j, dr->d_name))
-			{
-				closedir(dir);
-				return (0);
-			}
-			count++;
-		}
-		dr = readdir(dir);
-	}
-	closedir(dir);
+	matches = malloc(sizeof(char *) * ((size_t)count + 1));
+	if (!matches)
+		return (0);
+	if (!collect_matches(matches, pattern))
+		return (0);
+	sort_matches(matches);
+	if (!add_sorted_matches(newargs, j, matches))
+		return (0);
+	free(matches);
 	return (count);
 }

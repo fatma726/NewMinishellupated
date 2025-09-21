@@ -1,0 +1,95 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipe_core.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
+/*   Updated: 2025/09/20 19:07:17 by fatmtahmdab      ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
+#ifdef BUILD_BONUS
+# include "../../bonus/include/bonus.h"
+#endif
+
+void	exec_child(char **args, char **envp, t_node *node)
+{
+	char	**child_args;
+
+	node->exit_flag = 0;
+	close(node->fds[0]);
+	if (!node->right_flag)
+		dup2(node->fds[1], STDOUT_FILENO);
+	close(node->fds[1]);
+	signal(SIGPIPE, SIG_DFL);
+	if (!node->child_die)
+	{
+		child_args = split_before_pipe_args(args, node);
+		envp = shlvl_mod(1, envp);
+		envp = find_command(child_args, envp, node);
+		envp = shlvl_mod(-1, envp);
+		strarrfree(child_args);
+	}
+	exit(get_exit_status());
+}
+
+void	exec_parents(char **args, char **envp, t_node *node)
+{
+	node->exit_flag = 0;
+	close(node->fds[1]);
+	dup2(node->fds[0], STDIN_FILENO);
+	close(node->fds[0]);
+	node->pipe_flag = 0;
+	envp = repeat(args, envp, node);
+	backup_restor(node);
+}
+
+char	**cloturn(int backup_stdout, int backup_stdin, char **envp)
+{
+	close(backup_stdout);
+	close(backup_stdin);
+	return (envp);
+}
+
+int	pipe_check(char **args, t_node *node)
+{
+	int	i;
+
+	i = -1;
+	while (args[++i])
+	{
+		if (isp(node->ori_args[i]))
+		{
+			if (node->quota_idx_j < node->quota_pipe_cnt
+				&& node->quota_pipe_idx_arr[node->quota_idx_j] == i)
+				node->quota_idx_j++;
+			else
+			{
+				node->pipe_idx = i + 1;
+				node->pipe_flag = 1;
+				return (1);
+			}
+		}
+	}
+	node->pipe_flag = 0;
+	return (0);
+}
+
+void	init_node(t_node *node)
+{
+	node->child_die = 0;
+	node->echo_skip = 0;
+	node->escape_skip = false;
+	node->exit_flag = 1;
+	node->parent_die = 0;
+	node->pipe_flag = 0;
+	node->pipe_idx = 0;
+	node->quota_pipe_cnt = 0;
+	node->redir_idx = 0;
+	node->redir_stop = 0;
+	node->right_flag = 0;
+	node->cmd = NULL;
+}

@@ -1,25 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstnew.c                                        :+:      :+:    :+:   */
+/*   ft_lstnew_bonus.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lcouturi <lcouturi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/13 12:34:09 by lcouturi          #+#    #+#             */
-/*   Updated: 2023/10/27 17:21:20 by lcouturi         ###   ########.fr       */
+/*   Updated: 2023/10/27 17:18:24 by lcouturi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-t_list	*ft_lstnew(void *content)
+t_list	*ft_lstnew_bonus(void *content)
 {
-	t_list	*l;
+	t_list	*new;
 
-	l = malloc(sizeof(t_list));
-	if (!l)
-		return (l);
-	l->content = content;
-	l->next = 0;
-	return (l);
+	new = malloc(sizeof(t_list));
+	if (!new)
+		return (NULL);
+	new->content = content;
+	new->next = NULL;
+	return (new);
 }

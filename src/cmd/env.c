@@ -15,18 +15,9 @@
 static void	cmd_launch(char **args, char **envs, t_node *node)
 {
 	char	**args_new;
-	char	**envp;
 
 	if (!ft_strncmp(args[1], "-i", 3) && args[2])
-	{
-		envp = malloc(sizeof(char *));
-		envp[0] = NULL;
-		envp = ft_setenv_envp("PATH", ft_getenv("PATH", envs), envp);
-		args_new = strarrdup(args + 2);
-		envp = find_command(args_new, envp, node);
-		strarrfree(args_new);
-		strarrfree(envp);
-	}
+		handle_env_i_option(args, envs, node);
 	else
 	{
 		args_new = strarrdup(args + 1);

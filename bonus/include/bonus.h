@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   bonus.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
+/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/02 12:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/04 11:04:44 by fatima           ###   ########.fr       */
+/*   Updated: 2025/09/20 20:13:56 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,7 @@
 
 # include "minishell.h"
 
-/* Bonus features */
-
 /* Logical operators and parentheses */
-char	**split_operators(char *s, char **envp, t_node *n);
-char	**subshell(char *str, char **envp, t_node *node);
 bool	check_redirection_syntax(char *s, t_node *n);
 bool	is_operator_pair(char *s, size_t i, t_node *n);
 bool	starts_invalid(char *s, size_t i);
@@ -30,29 +26,18 @@ bool	syntax_err_pair(char *s, size_t i, t_node *n, int pair);
 char	*handle_triple_redir_error(char *str, t_node *node);
 char	*handle_paren_error(char *str, int count);
 
-/* Wildcards */
-char	**expand_wildcard(char **args, char **envp, t_node *node);
-char	**get_file_list(bool hidden);
-int		match_loop(char **split, char **files, int i);
-void	match(char *str, char **split, char **files, int i);
-char	**load_lst(struct dirent *dr, DIR *dir, bool hidden);
-
-/* Quote handling */
-char	*expand_envvar(char *str, char **envp, t_node *node);
-char	**rm_quotes(char **args, t_node *node);
-char	**rm_quotes_wildcards(char **args, t_node *node);
-
-/* Syntax helpers for bonus */
-bool	isdp(char *str);
-bool	isda(char *str);
-
 /* Wildcard helpers */
 int		count_matching_files(char *pattern);
 int		expand_pattern(char **newargs, int *j, char *pattern);
-void	wildcard_handler(char **args, char **newargs, int *i, t_node *node);
 int		count_wildcard_matches(char **args);
 int		process_all_args(char **args, char **newargs);
 void	cleanup_and_return(char **newargs, int j, char **args);
 int		matches_pattern(char *filename, char *pattern);
+int		collect_matches(char **matches, char *pattern);
+int		process_directory_entry(struct dirent *dr, char *pattern);
+void	sort_matches(char **matches);
+int		add_sorted_matches(char **newargs, int *j, char **matches);
+int		add_matching_file(char **newargs, int *j, char *filename);
+void	cleanup_matches(char **matches, int i, DIR *dir);
 
 #endif

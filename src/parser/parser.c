@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/09/06 20:53:40 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/07 14:01:28 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,44 +14,6 @@
 #ifdef BUILD_BONUS
 # include "../../bonus/include/bonus.h"
 #endif
-
-static bool	check_wildcard_redirections(char **args)
-{
-    (void)args;
-#ifdef BUILD_BONUS
-	int		i;
-	int		count;
-
-	i = -1;
-	while (args && args[++i])
-	{
-		/* skip here-doc tokens (<<, <<<) */
-		if (isdlr(args[i]) || istlr(args[i]))
-		{
-			/* do not treat heredoc delimiter as an expandable file */
-			i += (args[i + 1] != NULL);
-			continue ;
-		}
-		if (islr(args[i]) || islrr(args[i]) || isrr(args[i]) || isdrr(args[i]))
-		{
-			if (args[i + 1] && ft_strchr(args[i + 1], '*'))
-			{
-				count = count_matching_files(args[i + 1]);
-				if (count > 1)
-				{
-					ft_putstr_fd("bash: ", STDERR_FILENO);
-					ft_putstr_fd(args[i + 1], STDERR_FILENO);
-					ft_putendl_fd(": ambiguous redirect", STDERR_FILENO);
-					return (false);
-				}
-			}
-			/* skip operand */
-			i += (args[i + 1] != NULL);
-		}
-	}
-#endif
-	return (true);
-}
 
 static char	**process_parser_input(char *str, char **envp, t_node *node)
 {
@@ -83,7 +45,11 @@ static char	**handle_parser_errors(char **args, char **envp, t_node *node)
 	{
 		handle_syntax_error(envp, node);
 		strarrfree(args);
-		strarrfree(node->ori_args);
+		if (node->ori_args)
+		{
+			strarrfree(node->ori_args);
+			node->ori_args = NULL;
+		}
 		return (envp);
 	}
 	return (NULL);
@@ -94,13 +60,14 @@ static char	**process_quotes_and_exec(char **args, char **envp, t_node *node)
 	args = rm_quotes(args, node);
 	if (!args)
 	{
-		rl_clear_history();
+		clear_history();
 		strarrfree(envp);
 		exit(EXIT_FAILURE);
 	}
 	envp = execute(args, envp, node);
 	strarrfree(args);
-	strarrfree(node->ori_args);
+	if (node->ori_args)
+		strarrfree(node->ori_args);
 	return (envp);
 }
 
@@ -110,6 +77,8 @@ char	**parser(char *str, char **envp, t_node *node)
 
 	args = process_parser_input(str, envp, node);
 	if (handle_parser_errors(args, envp, node))
+	{
 		return (envp);
+	}
 	return (process_quotes_and_exec(args, envp, node));
 }

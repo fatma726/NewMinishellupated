@@ -5,23 +5,102 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/08/27 22:51:57 by fatmtahmdab      ###   ########.fr       */
+/*   Created: 1970/01/01 00:00:00 by fatmtahmdabrahym #+#    #+#             */
+/*   Updated: 2025/09/03 19:00:52 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	**cmd_export(char **args, char **envp, t_node *node)
+static void	print_declare_line(char *entry)
 {
-	set_exit_status(EXIT_SUCCESS);
-	if (!args[1] || (node->pipe_idx && isp(node->ori_args[1])))
-		return (export_print(envp));
-	else if (args[1][0] == '-')
+	size_t	i;
+	char	*name;
+	char	*value;
+
+	i = 0;
+	while (entry[i] && entry[i] != '=')
+		i++;
+	name = ft_substr(entry, 0, i);
+	if (entry[i] == '=')
+		value = ft_strdup(entry + i + 1);
+	else
+		value = NULL;
+	ft_putstr_fd("declare -x ", STDOUT_FILENO);
+	ft_putstr_fd(name, STDOUT_FILENO);
+	if (value && (value[0] || ft_strncmp(name, "OLDPWD", 7)))
 	{
-		handle_export_option_error(args);
-		return (envp);
+		ft_putstr_fd("=\"", STDOUT_FILENO);
+		print_escaped_value(value);
+		ft_putstr_fd("\"", STDOUT_FILENO);
 	}
-	process_export_args(args, &envp, node);
+	ft_putchar_fd('\n', STDOUT_FILENO);
+	free(name);
+	if (value)
+		free(value);
+}
+
+static void	print_sorted_env(char **envp)
+{
+	int		i;
+	size_t	idx;
+	char	*lowest;
+	char	*prev;
+
+	idx = 0;
+	prev = NULL;
+	while (idx < strarrlen(envp))
+	{
+		lowest = NULL;
+		i = -1;
+		while (envp[++i])
+			if ((!lowest || ft_strncmp(envp[i], lowest, ft_strlen(envp[i])) < 0)
+				&& (!idx || ft_strncmp(envp[i], prev, ft_strlen(envp[i])) > 0))
+				lowest = envp[i];
+		if (lowest && ft_strncmp(lowest, "_=", 2))
+			print_declare_line(lowest);
+		prev = lowest;
+		idx++;
+	}
+}
+
+char	**export_print(char **envp)
+{
+	print_sorted_env(envp);
+	if (!ft_getenv("OLDPWD", envp))
+		ft_putstr_fd("declare -x OLDPWD\n", STDOUT_FILENO);
+	fflush(stdout);
 	return (envp);
+}
+
+void	handle_export_option_error(char **args)
+{
+	char	export_error[25];
+	char	invalid_option[50];
+	char	usage[50];
+
+	ft_strlcpy(export_error, "minishell: export: ", 25);
+	ft_putstr_fd(export_error, STDERR_FILENO);
+	ft_putstr_fd(args[1], STDERR_FILENO);
+	ft_strlcpy(invalid_option, ": invalid option\nexport: usage: export ", 50);
+	ft_putstr_fd(invalid_option, STDERR_FILENO);
+	ft_strlcpy(usage, "[-fn] [name[=value] ...] or export -p\n", 50);
+	ft_putstr_fd(usage, STDERR_FILENO);
+	set_exit_status(2);
+}
+
+void	process_export_args(char **args, char ***envp, t_node *node)
+{
+	int		i;
+	bool	has_error;
+
+	i = 0;
+	has_error = false;
+	while (args[++i] && (!node->pipe_idx || i + 1 < node->pipe_idx))
+	{
+		if (!process_export_arg(args[i], envp, node))
+			has_error = true;
+	}
+	if (has_error)
+		set_exit_status(EXIT_FAILURE);
 }

@@ -6,14 +6,14 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/06 21:12:02 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/20 16:32:59 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# define MSTEST_MODE 1
+# define MSTEST_MODE 0
 
 /* includes */
 # include <dirent.h>
@@ -32,6 +32,9 @@
 # include <termios.h>
 # include <unistd.h>
 # include "../libs/Libft/libft.h"
+
+/* internal markers */
+# define WILDMARK 31
 
 typedef struct s_global_state
 {
@@ -111,15 +114,21 @@ void			set_exit_status(int status);
 /* bonus hooks (provided by stubs in mandatory build) */
 char			**split_operators(char *s, char **envp, t_node *n);
 char			**subshell(char *str, char **envp, t_node *node);
+bool			check_wildcard_redirections(char **args);
+char			**expand_wildcard_if_bonus(char **a, char **e, t_node *n);
+
+# ifdef BUILD_BONUS
+
+bool			is_redir_token(char *s);
+size_t			count_expanded_size(char **args);
+
+# endif
 
 /* cmds */
 void			checkdot(char **args, char **envp);
 void			chkdir(char **args, char **envp, bool end);
-void			cmd_alias(char **args, char **envp, t_node *node);
-void			printalias(char *str);
-void			set_alias(char *arg, char **envp, t_node *node);
-char			*find_lowest_alias(char **aliases, char *lowest_old,
-					unsigned int i2);
+void			handle_env_i_option(char **args, char **envs, t_node *node);
+/* alias features removed (not part of mandatory/bonus) */
 char			**cmd_cd(char **args, char **envp, t_node *node);
 bool			check_arg_count_with_slash(char **args, char **envp,
 					int offset);
@@ -143,6 +152,7 @@ void			handle_numeric_error(char *arg);
 void			handle_too_many_args(void);
 void			handle_exit_with_args(char **args);
 void			cleanup_and_exit(char **args, char **envp, t_node *node);
+void			handle_eof_exit(char **envp, t_node *node);
 char			**cmd_export(char **args, char **envp, t_node *node);
 char			**export_print(char **envp);
 void			print_escaped_value(char *value);
@@ -156,7 +166,7 @@ void			handle_path_update(char *arg, t_node *node);
 char			**handle_env_update(char *arg, char **envp, char *name, int j);
 bool			validate_export_identifier(char *arg);
 void			cmd_pwd(t_node *node);
-void			cmd_history(char **args, t_node *node);
+/* history built-in removed (not implemented) */
 char			**cmd_unset(char **args, char **envp, t_node *node);
 bool			is_valid_identifier(char *str);
 int				find_envkey(char *str, char *envp);
@@ -192,10 +202,7 @@ int				ft_setenv_var(const char *name, const char *value,
 					int overwrite);
 char			**ft_setenv_envp(const char *name, const char *value,
 					char **envp);
-char			*newpwd(t_node *node, char **envp);
-void			printenv(char *str);
-char			*curdir(char **envp);
-char			*get_curdir(void);
+/* removed unused helpers newpwd/printenv/curdir/get_curdir */
 
 /* main */
 // Removed internationalization - not required for evaluation
@@ -212,12 +219,14 @@ char			**setpwd(t_node *node, char **envp);
 char			**shlvl_mod(int mod, char **envp);
 
 # ifdef BUILD_BONUS
+
 // Bonus wildcard functions
 char			**expand_wildcard(char **args, char **envp, t_node *node);
 char			**get_file_list(bool hidden);
 int				get_arg_num(char **args, t_node *node);
 char			**load_lst(struct dirent *dr, DIR *dir, bool hidden);
 char			*expand_wildcard_redir(char *pattern, t_node *node);
+
 # endif
 
 char			**shlvl_plus_plus(char **envp);
@@ -237,19 +246,24 @@ size_t			strarrlen(char **strs);
 char			**process_command(char *line, char **envp, t_node *n);
 char			**check_braces(char *line, char **envp, t_node *n);
 char			**get_prompt(char **envp, t_node *n);
+/* process_command helpers */
+bool			is_blank(const char *s);
+int				find_unquoted_oror(const char *s, t_node *n);
+char			**run_oror(char *hashed, int idx, char **envp, t_node *n);
+char			**dispatch_line(char *hashed, char **envp, t_node *n);
 
 /* parser */
+char			*return_marked_unchanged(char *str);
+void			strip_wildmarks_inplace(char **args);
 bool			error_message(const char *token, char **envp, t_node *node);
 char			*escape_handler(char *str, t_node *node);
 char			**escape_split(char *s, char *charset, t_node *node);
 char			*expand_alias(char *str, t_node *node);
 char			*get_command(char *str, int i, int offset, t_node *node);
 char			*expand_envvar(char *str, char **envp, t_node *node);
+void			process_envvar(char **str, char **envp, t_node *node, int *i);
+void			insert_int(char *str, int *i);
 char			*expand_prompt(char *fmt, char **envp, t_node *node);
-char			**expand_wildcard(char **args, char **envp, t_node *node);
-char			**expand_wildcard_if_bonus(char **args, char **envp,
-					t_node *node);
-char			*expand_wildcard_redir(char *pattern, t_node *node);
 void			expand_wildcard_loop(char **args, char **newargs, char **envp,
 					t_node *node);
 void			failcheck(char **files, int *i, char **newargs, char **args);
@@ -259,11 +273,13 @@ void			wildcard_handler(char **args, char **newargs, int *i,
 					t_node *node);
 char			*add_spaces_around_ampersand(char *str, t_node *node);
 char			**find_command(char **args, char **envp, t_node *node);
-int				get_arg_num(char **args, t_node *node);
+char			**expand_wildcard(char **args, char **envp, t_node *node);
+char			*expand_wildcard_redir(char *pattern, t_node *node);
 char			**get_file_list(bool hidden);
+int				get_arg_num(char **args, t_node *node);
+char			**load_lst(struct dirent *dr, DIR *dir, bool hidden);
 int				match_loop(char **split, char **files, int i);
 void			match(char *str, char **split, char **files, int i);
-char			**load_lst(struct dirent *dr, DIR *dir, bool hidden);
 void			get_length(char *str, char **envp, int *i, t_node *node);
 char			*hash_handler(char *str, t_node *node);
 bool			in_heredoc(char *str, int i);

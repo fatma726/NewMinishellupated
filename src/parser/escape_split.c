@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/08/28 00:30:33 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/20 14:47:09 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,4 +65,10 @@ char	**escape_split(char *s, char *c, t_node *node)
 	while (i[0]--)
 		loop(str, returned, i, node);
 	return (returned);
+}
+
+char	*escape_handler(char *str, t_node *node)
+{
+	(void)node;
+	return (str);
 }

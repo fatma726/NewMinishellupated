@@ -1,21 +1,21 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
-# Install dependencies
+# Install necessary packages
 RUN apt-get update && apt-get install -y \
-    build-essential \
+    valgrind \
     gcc \
     make \
     libreadline-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
-WORKDIR /app
+WORKDIR /workspace
 
-# Copy source code
+# Copy project files
 COPY . .
 
 # Build the project
-RUN make
+RUN make clean && make
 
 # Default command
-CMD ["./minishell"]
+CMD ["bash"]

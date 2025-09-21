@@ -12,7 +12,32 @@
 
 #include "minishell.h"
 
-char	*ft_getenv(const char *name, char **envp)
+int	ft_setenv_var(const char *name, const char *value, int overwrite)
+{
+	(void)name;
+	(void)value;
+	(void)overwrite;
+	return (0);
+}
+
+static char	*build_env_pair_for_envp(const char *name, const char *value)
+{
+	char	*str;
+	size_t	n;
+
+	if (!value)
+		return (ft_strdup(name));
+	n = ft_strlen(name) + ft_strlen(value) + 2;
+	str = malloc(n);
+	if (!str)
+		return (NULL);
+	ft_strlcpy(str, name, n);
+	ft_strlcat(str, "=", n);
+	ft_strlcat(str, value, n);
+	return (str);
+}
+
+static int	find_env_index_local(const char *name, char **envp)
 {
 	int	i;
 
@@ -20,15 +45,26 @@ char	*ft_getenv(const char *name, char **envp)
 	while (envp[i] && (ft_strncmp(envp[i], name, ft_strlen(name))
 			|| (envp[i][ft_strlen(name)] != '=' && envp[i][ft_strlen(name)])))
 		i++;
-	if (!envp[i] || !ft_strchr(envp[i], '='))
-		return (NULL);
-	return (envp[i] + ft_strlen(name) + 1);
+	return (i);
 }
 
-int	ft_setenv_var(const char *name, const char *value, int overwrite)
+char	**ft_setenv_envp(const char *name, const char *value, char **envp)
 {
-	(void)name;
-	(void)value;
-	(void)overwrite;
-	return (0);
+	int		i;
+	char	*str;
+
+	if (!name || !*name || ft_strchr(name, '='))
+		return (envp);
+	str = build_env_pair_for_envp(name, value);
+	if (!str)
+		exit(EXIT_FAILURE);
+	i = find_env_index_local(name, envp);
+	if (envp[i])
+	{
+		free(envp[i]);
+		envp[i] = str;
+	}
+	else
+		envp = strarradd_take(envp, str);
+	return (envp);
 }

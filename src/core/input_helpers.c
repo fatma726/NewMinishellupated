@@ -11,6 +11,24 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include <readline/readline.h>
+#include <readline/history.h>
+
+void	handle_eof_exit(char **envp, t_node *node)
+{
+	if (node)
+	{
+		if (node->pwd)
+			free(node->pwd);
+		if (node->path_fallback)
+			free(node->path_fallback);
+	}
+	if (envp)
+		strarrfree(envp);
+	rl_clear_history();
+	restore_termios();
+	exit(get_exit_status());
+}
 
 static ssize_t	read_until_newline(char *buffer, size_t max)
 {
@@ -35,11 +53,11 @@ static ssize_t	read_until_newline(char *buffer, size_t max)
 
 char	*read_line_simple(void)
 {
-	char	buffer[1024];
+	char	buffer[4096];
 	char	*line;
 	ssize_t	len;
 
-	line = malloc(1024);
+	line = malloc(4096);
 	if (!line)
 		return (NULL);
 	len = read_until_newline(buffer, sizeof(buffer));
@@ -49,6 +67,6 @@ char	*read_line_simple(void)
 		return (NULL);
 	}
 	buffer[(size_t)len] = '\0';
-	ft_strlcpy(line, buffer, (size_t)len + 1);
+	ft_strlcpy(line, buffer, 4096);
 	return (line);
 }

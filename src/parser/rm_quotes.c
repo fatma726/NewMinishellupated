@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/08/28 01:13:11 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/20 20:15:21 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,13 @@ static char	*alloc_str(char *str, int *i, t_node *node)
 	while (str[++i[0]])
 	{
 		i[3] = quote_check(str, i[0], node);
-		if (!(i[3] != 2 && i[3] != 3 && str[i[0]] == '\"') && !(i[3] != 1
-				&& i[3] != 3 && str[i[0]] == '\'') && !(!i[3]
-				&& str[i[0]] == '\\'))
+		if (str[i[0]] == '\"' && i[3] != 1)
+			continue ;
+		else if (str[i[0]] == '\'' && i[3] != 2)
+			continue ;
+		else if (str[i[0]] == '\\' && i[3] == 0)
+			continue ;
+		else
 			l++;
 	}
 	newstr = malloc(((size_t)l + 1)
@@ -43,15 +47,21 @@ static char	*rm_quotes_loop(char *str, t_node *node)
 	int		j;
 	char	*newstr;
 
+	if (str && str[0] == (char)WILDMARK)
+		return (return_marked_unchanged(str));
 	j = 0;
 	newstr = alloc_str(str, i, node);
 	i[0] = -1;
 	while (str[++i[0]])
 	{
 		i[3] = quote_check(str, i[0], node);
-		if (!(i[3] != 2 && i[3] != 3 && str[i[0]] == '\"') && !(i[3] != 1
-				&& i[3] != 3 && str[i[0]] == '\'') && !(!i[3]
-				&& str[i[0]] == '\\'))
+		if (str[i[0]] == '\"' && i[3] != 1)
+			continue ;
+		else if (str[i[0]] == '\'' && i[3] != 2)
+			continue ;
+		else if (str[i[0]] == '\\' && i[3] == 0)
+			continue ;
+		else
 			newstr[j++] = str[i[0]];
 	}
 	newstr[j] = '\0';
@@ -93,7 +103,10 @@ char	**rm_quotes(char **args, t_node *node)
 	i = -1;
 	quote_pipe_check(args, node);
 	if (node->escape_skip)
+	{
+		strip_wildmarks_inplace(args);
 		return (args);
+	}
 	while (args[++i])
 		args[i] = rm_quotes_loop(args[i], node);
 	return (args);
@@ -104,7 +117,10 @@ char	**rm_quotes_wildcards(char **args, t_node *node)
 	int	i;
 
 	if (node->escape_skip)
+	{
+		strip_wildmarks_inplace(args);
 		return (args);
+	}
 	i = -1;
 	while (args[++i])
 		args[i] = rm_quotes_loop(args[i], node);

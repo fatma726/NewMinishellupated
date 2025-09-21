@@ -38,6 +38,46 @@ static void	handle_cd_arguments(char **args, char **envp, t_node *node,
 	}
 }
 
+bool	check_arg_count_with_slash(char **args, char **envp, int offset)
+{
+	char	*msg;
+
+	(void)envp;
+	if (strarrlen(args) > 4 + (size_t)offset)
+	{
+		set_exit_status(EXIT_FAILURE);
+		msg = ft_strdup(": too many arguments\n");
+		ft_putstr_fd(msg, STDERR_FILENO);
+		free(msg);
+		return (true);
+	}
+	return (false);
+}
+
+bool	check_arg_count_without_slash(char **args, char **envp, int offset)
+{
+	char	*msg;
+
+	(void)envp;
+	if (strarrlen(args) > 3 + (size_t)offset)
+	{
+		set_exit_status(EXIT_FAILURE);
+		msg = ft_strdup(": too many arguments\n");
+		ft_putstr_fd(msg, STDERR_FILENO);
+		free(msg);
+		return (true);
+	}
+	return (false);
+}
+
+bool	check_argument_count(char **args, char **envp, int offset)
+{
+	if (args[1 + offset] && !ft_strncmp(args[1 + offset], "/", 1))
+		return (check_arg_count_with_slash(args, envp, offset));
+	else
+		return (check_arg_count_without_slash(args, envp, offset));
+}
+
 char	**cmd_cd(char **args, char **envp, t_node *node)
 {
 	int		offset;

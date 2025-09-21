@@ -61,7 +61,10 @@ char	*add_spaces_around_ampersand(char *str, t_node *node)
 	len = ft_strlen(str);
 	result = malloc((len * 2 + 1) * sizeof(char));
 	if (!result)
+	{
+		free(str);
 		return (NULL);
+	}
 	len = (size_t)copy_with_ampersands(str, node, result);
 	result[len] = '\0';
 	free(str);

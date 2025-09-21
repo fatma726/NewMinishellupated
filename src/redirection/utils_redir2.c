@@ -44,6 +44,8 @@ void	args_left_move(char **args, int i)
 	{
 		free(args[i]);
 		args[i] = ft_strdup(args[i + 1]);
+		if (!args[i])
+			return ;
 		i++;
 	}
 	if (!args[i + 1])

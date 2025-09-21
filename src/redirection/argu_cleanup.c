@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatmtahmdab       #+#    #+#             */
-/*   Updated: 2025/08/29 03:08:36 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/20 13:19:54 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ static void	argu_cleanup(char **args, char **args2, int k, int len)
 		while (k + 2 < len)
 		{
 			args[k] = ft_strdup(args[k + 2]);
+			if (!args[k])
+				return ;
 			free(args[k + 2]);
 			args[k++ + 2] = NULL;
 		}

@@ -219,14 +219,7 @@ char			**setpwd(t_node *node, char **envp);
 char			**shlvl_mod(int mod, char **envp);
 
 # ifdef BUILD_BONUS
-
-// Bonus wildcard functions
-char			**expand_wildcard(char **args, char **envp, t_node *node);
-char			**get_file_list(bool hidden);
-int				get_arg_num(char **args, t_node *node);
-char			**load_lst(struct dirent *dr, DIR *dir, bool hidden);
-char			*expand_wildcard_redir(char *pattern, t_node *node);
-
+/* Bonus-specific APIs are declared once below in the parser section. */
 # endif
 
 char			**shlvl_plus_plus(char **envp);

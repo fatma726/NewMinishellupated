@@ -54,9 +54,14 @@ void	cleanup_and_exit(char **args, char **envp, t_node *node)
 	free(node->pwd);
 	if (node->path_fallback)
 		free(node->path_fallback);
+	if (node->ori_args)
+	{
+		strarrfree(node->ori_args);
+		node->ori_args = NULL;
+	}
 	strarrfree(args);
 	strarrfree(envp);
-	rl_clear_history();
+	clear_history();
 	restore_termios();
 	exit(get_exit_status());
 }

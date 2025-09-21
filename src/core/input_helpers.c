@@ -25,7 +25,7 @@ void	handle_eof_exit(char **envp, t_node *node)
 	}
 	if (envp)
 		strarrfree(envp);
-	rl_clear_history();
+	clear_history();
 	restore_termios();
 	exit(get_exit_status());
 }

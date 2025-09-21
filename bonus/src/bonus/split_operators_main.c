@@ -47,7 +47,10 @@ static char	**split_operators_tail(char *s, size_t i, char **envp, t_node *n)
 	int		skip;
 
 	if (!s[i])
+	{
+		free(s);
 		return (envp);
+	}
 	while (!get_exit_status() && s[i] && s[i] == '|' && s[i + 1] == '|')
 		advance_to(s, &i, n, '|');
 	while (get_exit_status() && s[i] && s[i] == '&' && s[i + 1] == '&')

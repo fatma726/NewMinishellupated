@@ -77,9 +77,6 @@ BONUS_SRCS := \
 	bonus/src/bonus/split_operators_helpers2.c \
 	bonus/src/bonus/subshell_consolidated.c \
 	bonus/src/bonus/subshell_main.c \
-	bonus/src/bonus/wildcard_parser_main.c \
-	bonus/src/bonus/wildcard_parser_helpers.c \
-	bonus/src/bonus/wildcard_parser_helpers2.c \
 	bonus/src/bonus/wildcard/wildcard_core.c \
 	bonus/src/bonus/wildcard/expand_wildcard_helpers.c \
 	bonus/src/bonus/wildcard/expand_wildcard_loop.c \
@@ -167,7 +164,7 @@ $(OBJ_DIR)/src/parser/wildcard_parser_helpers2_bonus.o: bonus/src/bonus/wildcard
 # Bonus sources under bonus/ with BUILD_BONUS flag
 $(OBJ_DIR)/bonus/%.o: bonus/%.c
 	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) -DBUILD_BONUS -I./include -c $< -o $@
+	@$(CC) $(CFLAGS) -DBUILD_BONUS -I./include -I./bonus/include -c $< -o $@
 
 $(LIBFT_DIR)/%.o: $(LIBFT_DIR)/%.c
 	@$(CC) -Wall -Wextra -Werror -I$(LIBFT_DIR) -c $< -o $@

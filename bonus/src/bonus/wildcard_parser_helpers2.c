@@ -15,12 +15,7 @@
 #ifdef BUILD_BONUS
 # include "bonus.h"
 
-void	break_on_first_pattern(char **args, char ***out, int *i,
-			bool *skip);
-void	append_arg_or_expand(char **newargs, int *j, char *arg);
-void	process_one_arg(char **args, char **newargs, int *ij,
-			bool *skip_next);
-void	build_expanded_args(char **args, char **newargs);
+/* prototypes provided in bonus.h */
 
 void	break_on_first_pattern(char **args, char ***out, int *i,
 								bool *skip)

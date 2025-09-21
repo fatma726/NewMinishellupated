@@ -15,21 +15,9 @@
 #ifdef BUILD_BONUS
 # include "bonus.h"
 
-bool		is_redir_token(char *s);
-size_t		count_expanded_size(char **args);
-bool		check_wildcard_redirections(char **args);
-void		build_expanded_args(char **args, char **newargs);
-void		process_one_arg(char **args, char **newargs, int *ij,
-				bool *skip_next);
-
 /* implemented in wildcard_parser_helpers.c */
 
-void		break_on_first_pattern(char **args, char ***out, int *i,
-				bool *skip);
-void		append_arg_or_expand(char **newargs, int *j, char *arg);
-void		process_one_arg(char **args, char **newargs, int *ij,
-				bool *skip_next);
-void		build_expanded_args(char **args, char **newargs);
+/* helper prototypes are provided by headers; avoid redundant decls */
 
 char	**expand_wildcard_if_bonus(char **args, char **envp, t_node *node)
 {

@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/20 20:17:05 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/21 16:20:31 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ int	main(int argc, char **argv, char **envp)
 {
 	t_node		node;
 
+	init_node(&node);
 	set_exit_status(0);
 	envp = strarrdup(envp);
 	envp = shlvl_plus_plus(setpwd(&node, envp));

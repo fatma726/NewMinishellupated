@@ -1,0 +1,8 @@
+# Ignore debug and test originals archived under devtools
+minishell_tester/**
+devtools/**
+devtools/**
+
+# Ignore build artifacts and debug symbol folders
+.dist/**
+*.dSYM/**

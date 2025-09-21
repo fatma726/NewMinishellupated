@@ -25,24 +25,28 @@ static bool	check_overflow_limits(char *arg)
 	return (false);
 }
 
-void	handle_exit_with_args(char **args)
+bool	handle_exit_with_args(char **args)
 {
 	long long	exit_num;
 
 	if (!ft_isalldigit(args[1]))
-		handle_numeric_error(args[1]);
-	else if (strarrlen(args) > 2)
-		handle_too_many_args();
-	else
 	{
-		exit_num = ft_atoll(args[1]);
-		if (check_overflow_limits(args[1]))
-		{
-			handle_numeric_error(args[1]);
-			return ;
-		}
-		set_exit_status((int)(exit_num & 0xFF));
+		handle_numeric_error(args[1]);
+		return (true);
 	}
+	if (strarrlen(args) > 2)
+	{
+		handle_too_many_args();
+		return (false);
+	}
+	exit_num = ft_atoll(args[1]);
+	if (check_overflow_limits(args[1]))
+	{
+		handle_numeric_error(args[1]);
+		return (true);
+	}
+	set_exit_status((int)(exit_num & 0xFF));
+	return (true);
 }
 
 void	cleanup_and_exit(char **args, char **envp, t_node *node)

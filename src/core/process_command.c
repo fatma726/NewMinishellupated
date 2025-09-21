@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   process_command.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
+/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/03 11:25:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/15 17:29:33 by fatima           ###   ########.fr       */
+/*   Updated: 2025/09/21 16:30:17 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,33 @@ static int	handle_non_printable_start(char *line)
 	return (0);
 }
 
+static int	handle_unmatched_quotes(char *line, t_node *n)
+{
+	int	q;
+
+	q = quote_check(line, (int)ft_strlen(line), n);
+	if (q == 1 || q == 2)
+	{
+		ft_putstr_fd("minishell: unexpected EOF wh", STDERR_FILENO);
+		if (q == 1)
+			ft_putendl_fd("ile looking for matching `''", STDERR_FILENO);
+		else
+			ft_putendl_fd("ile looking for matching `\"'", STDERR_FILENO);
+		set_exit_status(2);
+		free(line);
+		return (1);
+	}
+	return (0);
+}
+
+static void	prepare_node_for_line(t_node *n, char *line)
+{
+	init_node(n);
+	n->argmode = false;
+	n->escape_skip = !ft_strchr(line, '\'') && !ft_strchr(line, '"')
+		&& !ft_strchr(line, '\\');
+}
+
 char	**process_command(char *line, char **envp, t_node *n)
 {
 	char		*expanded;
@@ -47,10 +74,9 @@ char	**process_command(char *line, char **envp, t_node *n)
 		return (free(line), envp);
 	if (handle_non_printable_start(line))
 		return (envp);
-	init_node(n);
-	n->argmode = false;
-	n->escape_skip = !ft_strchr(line, '\'') && !ft_strchr(line, '"')
-		&& !ft_strchr(line, '\\');
+	if (handle_unmatched_quotes(line, n))
+		return (envp);
+	prepare_node_for_line(n, line);
 	result = check_braces(line, envp, n);
 	if (result)
 		return (result);

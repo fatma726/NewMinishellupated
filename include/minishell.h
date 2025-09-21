@@ -150,7 +150,7 @@ void			cmd_exit(char **args, char **envp, t_node *node);
 void			handle_exit_message(void);
 void			handle_numeric_error(char *arg);
 void			handle_too_many_args(void);
-void			handle_exit_with_args(char **args);
+bool			handle_exit_with_args(char **args);
 void			cleanup_and_exit(char **args, char **envp, t_node *node);
 void			handle_eof_exit(char **envp, t_node *node);
 char			**cmd_export(char **args, char **envp, t_node *node);

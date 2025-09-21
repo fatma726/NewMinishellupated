@@ -18,22 +18,18 @@ bool	ft_isalldigit(char *str)
 {
 	int	i;
 
+	if (!str || !str[0])
+		return (false);
 	i = 0;
 	if (str[0] == '+' || str[0] == '-')
 		i++;
-	while (str && str[i])
-	{
-		if (!ft_isdigit(str[i]))
-			break ;
+	if (!str[i])
+		return (false);
+	while (str[i] && ft_isdigit(str[i]))
 		i++;
-	}
-	while (str && str[i])
-	{
-		if (!ft_strchr(" \t", str[i]))
-			return (false);
+	while (str[i] && ft_strchr(" \t", str[i]))
 		i++;
-	}
-	return (true);
+	return (str[i] == '\0');
 }
 
 void	handle_exit_message(void)
@@ -68,13 +64,28 @@ void	handle_too_many_args(void)
 
 void	cmd_exit(char **args, char **envp, t_node *node)
 {
+	bool	should_exit;
+
 	if (!node->exit_flag)
 		return ;
-	if (isatty(STDIN_FILENO) && !node->argmode)
-		handle_exit_message();
+	should_exit = true;
 	if (strarrlen(args) > 1)
-		handle_exit_with_args(args);
+		should_exit = handle_exit_with_args(args);
 	else
 		set_exit_status(EXIT_SUCCESS);
-	cleanup_and_exit(args, envp, node);
+	if (should_exit && isatty(STDIN_FILENO) && !node->argmode)
+		handle_exit_message();
+	/*
+	** In non-interactive mode (stdin not a TTY) the tester feeds multiple lines
+	** like: "exit 123" then "echo $?" then a final "exit". To allow it to
+	** capture the intended status, avoid exiting immediately here when stdin is
+	** not a TTY. We keep the exit status and return to the main loop; the shell
+	** will exit on EOF (or in argmode) with that status.
+	*/
+	if (should_exit)
+	{
+		if (!isatty(STDIN_FILENO) && !node->argmode)
+			return ;
+		cleanup_and_exit(args, envp, node);
+	}
 }

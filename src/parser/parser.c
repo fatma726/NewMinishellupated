@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
+/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/09/07 14:01:28 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/22 22:22:01 by fatima           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,12 @@ static char	**process_parser_input(char *str, char **envp, t_node *node)
 
 	str = expand_envvar(str, envp, node);
 	str = add_spaces_around_ampersand(str, node);
+	str = add_spaces_around_redirections(str, node);
 	ft_strlcpy(charset, " \t", 4);
 	args = escape_split(str, charset, node);
-	if (!check_wildcard_redirections(args))
-	{
-		free(str);
-		strarrfree(args);
-		set_exit_status(1);
+	args = apply_wildcard_phase(args, envp, node, str);
+	if (!args)
 		return (NULL);
-	}
-	args = expand_wildcard_if_bonus(args, envp, node);
 	free(str);
 	node->ori_args = strarrdup(args);
 	return (args);

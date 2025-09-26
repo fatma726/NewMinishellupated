@@ -89,14 +89,14 @@ bool	process_export_arg(char *arg, char ***envp, t_node *node)
 	j = 0;
 	while (arg[j] && arg[j] != '=')
 		j++;
+	tmp = ft_substr(arg, 0, (size_t)j);
+	name = ft_strtrim(tmp, "+");
+	free(tmp);
+	handle_path_update(arg, node);
 	if (arg[j] == '=')
-	{
-		tmp = ft_substr(arg, 0, (size_t)j);
-		name = ft_strtrim(tmp, "+");
-		free(tmp);
-		handle_path_update(arg, node);
 		*envp = handle_env_update(arg, *envp, name, j);
-		free(name);
-	}
+	else
+		*envp = ft_setenv_envp(name, "", *envp);
+	free(name);
 	return (true);
 }

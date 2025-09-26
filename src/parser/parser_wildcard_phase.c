@@ -1,50 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   wildcard.c                                         :+:      :+:    :+:   */
+/*   parser_wildcard_phase.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
+/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/20 17:00:50 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/22 22:22:01 by fatima           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#ifdef BUILD_BONUS
+# include "../../bonus/include/bonus.h"
 
-#ifndef BUILD_BONUS
-
-int	get_arg_num(char **args, t_node *node)
+char	**apply_wildcard_phase(char **args, char **envp, t_node *node,
+		char *orig)
 {
-	(void)args;
-	(void)node;
-	return (0);
+	if (!check_wildcard_redirections(args))
+	{
+		free(orig);
+		strarrfree(args);
+		set_exit_status(1);
+		return (NULL);
+	}
+	return (expand_wildcard_if_bonus(args, envp, node));
 }
 
-char	**load_lst(struct dirent *dr, DIR *dir, bool hidden)
-{
-	char	**files;
+#else
 
-	(void)dr;
-	(void)dir;
-	(void)hidden;
-	files = malloc(sizeof(char *));
-	if (!files)
-		exit(EXIT_FAILURE);
-	files[0] = NULL;
-	return (files);
-}
-
-bool	check_wildcard_redirections(char **args)
-{
-	(void)args;
-	return (true);
-}
-
-char	**expand_wildcard_if_bonus(char **args, char **envp, t_node *node)
+char	**apply_wildcard_phase(char **args, char **envp, t_node *node,
+		char *orig)
 {
 	(void)envp;
 	(void)node;
+	(void)orig;
 	return (args);
 }
 

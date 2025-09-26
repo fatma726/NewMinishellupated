@@ -18,21 +18,17 @@ An attempt at a minimal UNIX shell. This is specifically attempting to immitate 
 * `pwd` as built-in command.
 * `unset` as built-in command.
 
-The following bonus features were also implemented:
+Bonus features are documented separately and are not part of the mandatory build.
 
-* AND (`&&`) and OR (`||`) operators.
-* Fake subshells (`(`, `)`). Code just checks for syntax errors with parentheses and otherwise ignores them, which as it turns out is enough to pass most of the tests.
-* Wildcard (`*`) expansion (for files in current working directory only).
-
-For fun, the following features were also implemented despite not being mentioned in the PDF:
+For fun (non-mandatory), the following features were also implemented:
 
 * Backslash (`\`) escaping.
 * Comments (`#`).
 * More redirections (`<<<`, `<>`).
 * Tilde `~` expansion.
-* Semi-colon (`;`) command splitting.
-* Running commands externally with the `-c` argument.
-* Translations (French and English only, but more can easily be added).
+* Semi-colon (`;`) command splitting (non-mandatory).
+* Running commands externally with the `-c` argument (removed for evaluation build).
+* Translations (non-mandatory).
 * A bunch of really niche features and edge cases (symlink support for `pwd`, `$SHLVL` incrementation, `$_` and a whole lot more).
 * Custom prompt support via the PS1 environment variable (see next section).
 * Command completion prompt for unclosed quotes or backslashes at the end of commands.
@@ -56,7 +52,7 @@ The implementation for a lot of this is less than ideal because I lack a lot of 
 
 This project was mainly tested against Bash 5.2 using a number of tester programs available online. When using these testers, it is thus recommended to have Bash 5.2 installed. Bash 3.2, which is the version included in macOS by default, has some differences which will cause some tests to fail. Here are the results (last updated on July 28th, 2024):
 
-### [mstest](https://github.com/zstenger93/42_minishell_tester)
+### [mstest](https://github.com/zstenger93/42_minishell_tester) (mandatory)
 
 For this tester to work, the MSTEST_MODE macro must be set to true.
 
@@ -80,7 +76,7 @@ Dunno what problem the tester has with most of these, except for tests 30 and 31
 * 179 cases passed.
 * 4 cases failed, including 4 EXIT_CODE cases.
 
-### [minishell_tester](https://github.com/LucasKuhn/minishell_tester)
+### [minishell_tester](https://github.com/LucasKuhn/minishell_tester) (mandatory)
 
 For this tester to work, the MSTEST_MODE macro must be set to false.
 
@@ -90,19 +86,7 @@ For this tester to work, the MSTEST_MODE macro must be set to false.
 
 Five tests have warnings, all of them caused by minishell_tester expecting a `Permission denied` with my minishell instead printing nothing. I'm not sure how to reproduce these warnings, so they have not been fixed.
 
-#### ./tester bonus
-
-7/19 tests passed.
-
-For whatever reason almost all of these are just syntax error tests. I haven't really implemented syntax errors for the operators yet, so they're failing.
-
-#### ./tester bonus_bonus
-
-3/3 tests passed.
-
-Test 2 gets a warning because the tester doesn't like the fact that I'm printing the second line of the error message, which is weird because it does have two lines in bash.
-
-#### ./tester os_specific
+#### ./tester os_specific (extra)
 
 10/11 tests passed.
 
@@ -110,11 +94,7 @@ Test 2 gets a warning because the tester doesn't like the fact that I'm printing
 
 17/17 tests passed.
 
-#### ./tester wildcards
-
-17/17 tests passed.
-
-`minishell` must be compiled with `make bonus` for this test to work. The generated binary will be identical, the tester just expects a binary named `minishell_bonus` for tests related to bonus features.
+Bonus-specific tests (wildcards, logical operators, subshells) live in `README_BONUS.md`.
 
 ### [minishell_test](https://github.com/cacharle/minishell_test)
 

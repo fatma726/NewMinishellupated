@@ -12,15 +12,94 @@
 
 #include "minishell.h"
 
+/* join into result with a newline between chunks */
+
+static void	set_continuation_prompt(char **current_prompt, char *original)
+{
+	if (*current_prompt != original)
+		free(*current_prompt);
+	*current_prompt = ft_strdup("> ");
+}
+
+static int	append_line(char **result, char *line)
+{
+	char	*tmp;
+
+	if (*result)
+	{
+		tmp = ft_strjoin(*result, "\n");
+		free(*result);
+		*result = ft_strjoin(tmp, line);
+		free(tmp);
+	}
+	else
+		*result = ft_strdup(line);
+	free(line);
+	return (*result != NULL);
+}
+
+static int	process_read_line(char **result, char **cur_prompt, char *orig)
+{
+	char	*line;
+
+	line = readline(*cur_prompt);
+	if (!line)
+	{
+		if (*result)
+			free(*result);
+		return (-1);
+	}
+	if (!append_line(result, line))
+		return (-1);
+	if (quote_check(*result, (int)ft_strlen(*result), NULL) == 0)
+		return (0);
+	set_continuation_prompt(cur_prompt, orig);
+	return (1);
+}
+
+static char	*get_continuation_line(char *prompt)
+{
+	char	*result;
+	char	*current_prompt;
+	int		st;
+
+	result = NULL;
+	current_prompt = prompt;
+	while (1)
+	{
+		st = process_read_line(&result, &current_prompt, prompt);
+		if (st < 0)
+		{
+			if (current_prompt != prompt)
+				free(current_prompt);
+			return (NULL);
+		}
+		if (st == 0)
+		{
+			if (current_prompt != prompt)
+				free(current_prompt);
+			return (result);
+		}
+	}
+	if (current_prompt != prompt)
+		free(current_prompt);
+	return (result);
+}
+
 char	*get_line(char *str)
 {
 	char	*line;
 	char	*line2;
+	char	*prompt;
 
 	if (isatty(STDIN_FILENO))
-		line = readline(str);
+	{
+		prompt = ft_strdup(str);
+		line = get_continuation_line(prompt);
+		free(prompt);
+	}
 	else if (MSTEST_MODE)
-		line = readline("minishell$ ");
+		line = readline(NULL);
 	else
 	{
 		line2 = read_line_simple();
@@ -30,38 +109,4 @@ char	*get_line(char *str)
 		free(line2);
 	}
 	return (line);
-}
-
-static void	handle_quote_error(int quote_type)
-{
-	char	eof_msg[35];
-
-	ft_strlcpy(eof_msg, "minishell: unexpected EOF wh", 35);
-	ft_putstr_fd(eof_msg, STDERR_FILENO);
-	if (quote_type == 1)
-		ft_putendl_fd("ile looking for matching `''", STDERR_FILENO);
-	else
-		ft_putendl_fd("ile looking for matching `\"'", STDERR_FILENO);
-	set_exit_status(2);
-}
-
-static void	process_quotes(char *arg, t_node *node)
-{
-	if (quote_check(arg, (int)ft_strlen(arg), node) == 1
-		|| quote_check(arg, (int)ft_strlen(arg), node) == 2)
-		handle_quote_error(quote_check(arg, (int)ft_strlen(arg), node));
-}
-
-void	argmode(char *line, char *arg, char **envp, t_node *node)
-{
-	node->escape_skip = !ft_strchr(arg, '\'') && !ft_strchr(arg, '\"')
-		&& !ft_strchr(arg, '\\');
-	process_quotes(arg, node);
-	init_node(node);
-	node->argmode = true;
-	if (arg && *arg)
-		envp = subshell(hash_handler(ft_strdup(arg), node), envp, node);
-	else
-		free(line);
-	cleanup_and_exit(NULL, envp, node);
 }

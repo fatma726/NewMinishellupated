@@ -6,23 +6,69 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/20 14:32:02 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/26 18:20:09 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include <limits.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 
-static bool	check_overflow_limits(char *arg)
+static bool	parse_strict_ll(const char *s, long long *out)
 {
-	if (ft_strlen(arg) > 20)
-		return (true);
-	if (ft_strncmp(arg, "9223372036854775808", 20) == 0)
-		return (true);
-	if (ft_strncmp(arg, "-9223372036854775809", 21) == 0)
-		return (true);
-	return (false);
+	long long	res;
+	int			sign;
+	size_t		i;
+
+	if (!s)
+		return (false);
+	i = 0;
+	while ((s[i] > '\b' && s[i] <= '\r') || s[i] == ' ')
+		i++;
+	sign = 1;
+	if (s[i] == '+' || s[i] == '-')
+	{
+		sign = (s[i] == '-') ? -1 : 1;
+		i++;
+	}
+	if (!ft_isdigit(s[i]))
+		return (false);
+	res = 0;
+	if (sign > 0)
+	{
+		while (ft_isdigit(s[i]))
+		{
+			int d = s[i] - '0';
+			if (res > (LLONG_MAX - d) / 10)
+				return (false);
+			res = res * 10 + d;
+			i++;
+		}
+	}
+	else
+	{
+		while (ft_isdigit(s[i]))
+		{
+			int d = s[i] - '0';
+			if (res < (LLONG_MIN + d) / 10)
+				return (false);
+			res = res * 10 - d;
+			i++;
+		}
+	}
+	while ((s[i] > '\b' && s[i] <= '\r') || s[i] == ' ')
+		i++;
+	if (s[i] != '\0')
+		return (false);
+	*out = res;
+	return (true);
+}
+
+static int	normalize_status(long long n)
+{
+	/* Match bash: exit value is truncated to unsigned char */
+	return ((int)((unsigned char)n));
 }
 
 bool	handle_exit_with_args(char **args)
@@ -39,13 +85,12 @@ bool	handle_exit_with_args(char **args)
 		handle_too_many_args();
 		return (false);
 	}
-	exit_num = ft_atoll(args[1]);
-	if (check_overflow_limits(args[1]))
+	if (!parse_strict_ll(args[1], &exit_num))
 	{
 		handle_numeric_error(args[1]);
 		return (true);
 	}
-	set_exit_status((int)(exit_num & 0xFF));
+	set_exit_status(normalize_status(exit_num));
 	return (true);
 }
 

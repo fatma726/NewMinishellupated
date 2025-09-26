@@ -1,28 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parser_helpers.c                                   :+:      :+:    :+:   */
+/*   exec_utils2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 1970/01/01 00:00:00 by fatmtahmdabrahym #+#    #+#             */
-/*   Updated: 2025/01/29 19:31:40 by fatmtahmdabrahym ###   ########.fr       */
+/*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
+/*   Updated: 2025/09/26 19:20:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	**find_command(char **args, char **envp, t_node *node)
+bool	is_builtin_command(char **args)
 {
-	int	i;
-
-	if (!args || !args[0])
-		return (envp);
-	i = 0;
-	while (args[i] && args[i + 1] && !isp(node->ori_args[i + 1]))
-		i++;
-	envp = ft_setenv_envp("_", args[i], envp);
-	return (dispatch_builtin(args, envp, node));
+	if (!access(args[0], X_OK) || !ft_strncmp(args[0], "cd", 3)
+		|| !ft_strncmp(args[0], "echo", 5) || !ft_strncmp(args[0], "env", 4)
+		|| !ft_strncmp(args[0], "exit", 5) || !ft_strncmp(args[0], "export", 7)
+		|| !ft_strncmp(args[0], "pwd", 4) || !ft_strncmp(args[0], "unset", 6))
+		return (true);
+	return (false);
 }
-
-/* moved to parser_wildcard_phase.c */

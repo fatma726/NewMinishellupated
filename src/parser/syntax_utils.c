@@ -17,12 +17,11 @@ bool	check_leading_operators_syntax(char **a)
 	if (a[0] && (isp(a[0]) || istr(a[0])
 			|| isdp(a[0]) || isda(a[0]) || is_ampersand(a[0])))
 		return (false);
-	if (a[0] && (islr(a[0]) || isrr(a[0]) || isdrr(a[0])) && !a[1])
+	if (a[0] && (islr(a[0]) || isrr(a[0]) || isdrr(a[0]) || isdlr(a[0]))
+		&& !a[1])
 		return (false);
-	if (a[0] && isdlr(a[0]) && a[1])
+	if (a[0] && isdlr(a[0]))
 		return (true);
-	if (a[0] && isdlr(a[0]) && !a[1])
-		return (false);
 	return (true);
 }
 
@@ -42,7 +41,7 @@ bool	check_trailing_operators_syntax(char **a)
 	i = 0;
 	while (a[i] && a[i + 1])
 		i++;
-	if (i > 0 && a[i] && (isp(a[i]) || islr(a[i]) || isrr(a[i])
+	if (i >= 0 && a[i] && (isp(a[i]) || islr(a[i]) || isrr(a[i])
 			|| isdlr(a[i]) || isdrr(a[i]) || isdp(a[i]) || isda(a[i])
 			|| is_ampersand(a[i]))
 		&& !ft_strchr(a[i], '\'') && !ft_strchr(a[i], '"'))

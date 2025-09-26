@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/02 12:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/20 20:13:56 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/24 12:00:49 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include "minishell.h"
 
 /* Logical operators and parentheses */
+char	**split_operators(char *s, char **envp, t_node *n);
 bool	check_redirection_syntax(char *s, t_node *n);
 bool	is_operator_pair(char *s, size_t i, t_node *n);
 bool	starts_invalid(char *s, size_t i);

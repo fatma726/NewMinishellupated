@@ -16,6 +16,8 @@ static int	getsize(long n)
 {
 	int	s;
 
+	if (n < 0)
+		n = -n;
 	s = 1;
 	if (!n)
 		s++;
@@ -37,6 +39,8 @@ static int	handle_envvar_length(char *str, char **envp, int *i)
 {
 	int	j;
 
+	if (!str || !envp || !i)
+		return (0);
 	j = -1;
 	if (str[++i[0]] == '?')
 	{
@@ -44,7 +48,7 @@ static int	handle_envvar_length(char *str, char **envp, int *i)
 		return (1);
 	}
 	i[1] = i[0];
-	while (ft_isalnum(str[i[1]]) || str[i[1]] == '_')
+	while (str[i[1]] && (ft_isalnum(str[i[1]]) || str[i[1]] == '_'))
 		i[1]++;
 	i[2] = 0;
 	while (envp[i[2]]

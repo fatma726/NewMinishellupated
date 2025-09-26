@@ -3,25 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   expand_wildcard_loop.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
+/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/04 09:47:54 by fatima           ###   ########.fr       */
+/*   Updated: 2025/09/23 15:52:27 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
-
-static void	handle_redirection_skip(char **args, char **newargs, int *i)
-{
-	if (i[2] > 0 && (isrr(args[i[2] - 1]) || isdrr(args[i[2] - 1])
-			|| islr(args[i[2] - 1]) || islrr(args[i[2] - 1])
-			|| isdlr(args[i[2] - 1]) || istlr(args[i[2] - 1])))
-	{
-		newargs[i[5]++] = ft_strdup(args[i[2]]);
-		return ;
-	}
-}
+#include "../../../include/bonus.h"
 
 static void	process_wildcard_in_arg(char **args, char **newargs, int *i,
 		t_node *node)
@@ -43,18 +32,25 @@ void	expand_wildcard_loop(char **args, char **newargs, char **envp,
 		t_node *node)
 {
 	int											i[6];
+	bool										skip_wildcard;
 
 	i[2] = -1;
 	i[5] = 0;
 	while (args[++i[2]])
 	{
-		handle_redirection_skip(args, newargs, i);
+		skip_wildcard = false;
 		if (i[2] > 0 && (isrr(args[i[2] - 1]) || isdrr(args[i[2] - 1])
 				|| islr(args[i[2] - 1]) || islrr(args[i[2] - 1])
 				|| isdlr(args[i[2] - 1]) || istlr(args[i[2] - 1])))
-			continue ;
-		tilde_handler(args, i, envp);
-		process_wildcard_in_arg(args, newargs, i, node);
+		{
+			newargs[i[5]++] = ft_strdup(args[i[2]]);
+			skip_wildcard = true;
+		}
+		if (!skip_wildcard)
+		{
+			tilde_handler(args, i, envp);
+			process_wildcard_in_arg(args, newargs, i, node);
+		}
 	}
 	newargs[i[5]] = NULL;
 }

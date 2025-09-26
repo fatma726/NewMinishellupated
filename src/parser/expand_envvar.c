@@ -60,7 +60,6 @@ char	*expand_envvar(char *str, char **envp, t_node *node)
 	if (!strs[1])
 	{
 		free(str);
-		strarrfree(envp);
 		exit(EXIT_FAILURE);
 	}
 	strs[0] = str;

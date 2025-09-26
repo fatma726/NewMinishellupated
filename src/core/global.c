@@ -6,31 +6,41 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/20 13:30:00 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/24 12:11:09 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include <signal.h>
 
-static sig_atomic_t	*signal_slot(void)
-{
-	static sig_atomic_t	value = 0;
+/* Single global slot for both signal number and last exit status */
 
-	return (&value);
+static struct s_global_slots	*slots(void)
+{
+	static struct s_global_slots	state = {0, 0};
+
+	return (&state);
 }
 
 int	get_signal_number(void)
 {
-	return (*signal_slot());
+	return ((int)slots()->signal_number);
 }
 
 void	clear_signal_number(void)
 {
-	*signal_slot() = 0;
+	slots()->signal_number = 0;
 }
 
 void	set_signal_number(int sig)
 {
-	*signal_slot() = sig;
+	slots()->signal_number = (sig_atomic_t)sig;
+}
+
+/* internal helper to get/set exit status without adding globals elsewhere */
+int	_ms_exit_status(int op, int value)
+{
+	if (op)
+		slots()->exit_status = value;
+	return (slots()->exit_status);
 }

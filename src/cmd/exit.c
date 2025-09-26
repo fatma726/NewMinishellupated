@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/08/28 15:47:02 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/21 16:39:06 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,13 +75,6 @@ void	cmd_exit(char **args, char **envp, t_node *node)
 		set_exit_status(EXIT_SUCCESS);
 	if (should_exit && isatty(STDIN_FILENO) && !node->argmode)
 		handle_exit_message();
-	/*
-	** In non-interactive mode (stdin not a TTY) the tester feeds multiple lines
-	** like: "exit 123" then "echo $?" then a final "exit". To allow it to
-	** capture the intended status, avoid exiting immediately here when stdin is
-	** not a TTY. We keep the exit status and return to the main loop; the shell
-	** will exit on EOF (or in argmode) with that status.
-	*/
 	if (should_exit)
 	{
 		if (!isatty(STDIN_FILENO) && !node->argmode)

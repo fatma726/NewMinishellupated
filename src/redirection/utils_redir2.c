@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils_redir2.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
+/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/04 10:40:46 by fatima           ###   ########.fr       */
+/*   Updated: 2025/09/24 11:14:23 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,14 +62,6 @@ bool	is_redir(char **args, int i, int j)
 
 /* moved to utils_redir3.c to satisfy norm function count */
 
-void	handle_echo_skip(char **args, t_node *node)
-{
-	if (!ft_strncmp(args[0], "echo", 5)
-		&& !ft_strncmp(args[1], "./", 2)
-		&& !args[2])
-		node->echo_skip = 1;
-}
-
 int	open_redir_out(char **args, int i, t_node *node, int flags)
 {
 	int		fd;
@@ -93,3 +85,17 @@ int	open_redir_out(char **args, int i, t_node *node, int flags)
 	}
 	return (fd);
 }
+
+void	args_left_move_i(char **args, t_node *node)
+{
+	int	i;
+
+	i = 0;
+	while (++i < node->redir_idx)
+	{
+		args_left_move(args, 1);
+		args_left_move(node->ori_args, 1);
+	}
+}
+
+/* moved to utils_redir4.c to satisfy norm function count */

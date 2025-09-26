@@ -68,3 +68,27 @@ char	**ft_setenv_envp(const char *name, const char *value, char **envp)
 		envp = strarradd_take(envp, str);
 	return (envp);
 }
+
+static bool	env_has_key_any(char **envp, const char *name)
+{
+	int			i;
+	size_t		len;
+
+	len = ft_strlen(name);
+	i = 0;
+	while (envp[i])
+	{
+		if (!ft_strncmp(envp[i], name, len)
+			&& (envp[i][len] == '=' || envp[i][len] == '\0'))
+			return (true);
+		i++;
+	}
+	return (false);
+}
+
+char	**ensure_oldpwd_export(char **envp)
+{
+	if (!env_has_key_any(envp, "OLDPWD"))
+		envp = ft_setenv_envp("OLDPWD", NULL, envp);
+	return (envp);
+}

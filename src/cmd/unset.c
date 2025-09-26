@@ -54,7 +54,7 @@ char	**delete_env(char *str, char **envp, t_node *node, int *flag)
 
 	last = (int)strarrlen(envp);
 	if (last < 1)
-		return (0);
+		return (envp);
 	clear_path_fallback_if(str, node);
 	i = -1;
 	while (envp[++i])

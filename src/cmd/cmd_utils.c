@@ -12,6 +12,27 @@
 
 #include "minishell.h"
 
+static char	**get_paths(char *path_env, t_node *node)
+{
+	if (!path_env || !path_env[0])
+	{
+		if (node->path_fallback)
+			return (ft_split(node->path_fallback, ':'));
+		return (ft_split("/usr/bin:/bin", ':'));
+	}
+	return (ft_split(path_env, ':'));
+}
+
+static void	handle_slash_command(char **args, char **envp, t_node *node)
+{
+	if (ft_strchr(args[0], '/'))
+	{
+		if (!access(args[0], X_OK))
+			envp = exec_pipe(args[0], args, envp, node);
+		chkdir(args, envp, 1);
+	}
+}
+
 /* From unset.c */
 char	**cmd_unset(char **args, char **envp, t_node *node)
 {
@@ -42,24 +63,17 @@ char	**cmd_export(char **args, char **envp, t_node *node)
 	return (envp);
 }
 
-/* From exec_proc.c */
 void	exec_proc(char **args, char **envp, t_node *node)
 {
 	char	**paths;
+	char	*path_env;
 
 	if (!args[0][0])
 		exec_error(args, envp, 0);
 	checkdot(args, envp);
-	if (ft_strchr(args[0], '/'))
-	{
-		if (!access(args[0], X_OK))
-			envp = exec_pipe(args[0], args, envp, node);
-		chkdir(args, envp, 1);
-	}
-	if (node->path_fallback)
-		paths = ft_split(node->path_fallback, ':');
-	else
-		paths = ft_split(ft_getenv("PATH", envp), ':');
+	handle_slash_command(args, envp, node);
+	path_env = ft_getenv("PATH", envp);
+	paths = get_paths(path_env, node);
 	if (!paths || !paths[0])
 		exec_nopath(node, args, envp, paths);
 	node->i = -1;

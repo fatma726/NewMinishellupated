@@ -22,7 +22,7 @@ ERROR_COLOR     := \033[38;5;196m  # Red
 INFO_COLOR      := \033[38;5;75m   # Blue
 HIGHLIGHT_COLOR := \033[38;5;201m  # Magenta
 
-CC      := gcc
+CC      := cc
 CFLAGS  := -Werror -Wall -Wextra -Wpedantic -Wshadow -Wunused-parameter -Wunused-variable -Wunused-function -Wformat=2 -Wconversion -Wcast-align -Wcast-qual -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wnested-externs
 CFLAGS  += -I./include
 
@@ -54,10 +54,10 @@ LIBFT_OBJS := $(addprefix $(LIBFT_DIR)/, $(LIBFT_SRCS:.c=.o))
 LIBFT     := $(LIBFT_DIR)/libft.a
 
 # Source files (consolidated structure)
-MAIN = env_utils env_utils2 env_helpers global status input_utils input_helpers main process_command process_command_helpers core_utils strarrutils stubs wildcard signals memory_validation
-CMD = cd cd_utils basic_commands cmd_utils env exec exec_error exec_utils exit exit_utils export export_utils export_helpers unset unset_utils
-PARSER =  escape_split expand_envvar expand_envvar_helpers parser_utils operator_utils operator_helpers operator_checks parser parser_helpers prompt_helpers rm_quotes rm_quotes_utils syntax_utils syntax_helpers syntax_helpers_utils syntax syntax_helpers3 syntax_helpers4
-REDIR = argu_cleanup cmd_redir exec_redir heredoc_utils redir_utils utils_redir utils_redir2 utils_redir3
+MAIN = env_utils env_utils2 env_helpers global status input_utils input_helpers main process_command process_command_helpers core_utils strarrutils stubs signals memory_validation
+CMD = cd cd_utils basic_commands cmd_utils env exec exec_error exec_utils exec_utils2 exit exit_utils export export_utils export_helpers unset unset_utils
+PARSER =  escape_split expand_envvar expand_envvar_helpers parser_utils operator_utils operator_helpers operator_checks parser parser_helpers parser_wildcard_phase prompt_helpers rm_quotes rm_quotes_utils syntax_utils syntax_helpers syntax_helpers_utils syntax syntax_helpers3 syntax_helpers4 add_spaces_ampersand add_spaces_redirections add_spaces_redirections_helpers
+REDIR = argu_cleanup cmd_redir exec_redir heredoc_utils redir_utils utils_redir utils_redir2 utils_redir3 utils_redir4
 PIPE = pipe_core pipe_utils pipe_helpers
 
 SRCS =	$(addsuffix .c, $(addprefix src/core/, $(MAIN))) \
@@ -93,7 +93,8 @@ BONUS_OBJS := $(BONUS_SRCS:%.c=$(OBJ_DIR)/%.o)
 BONUS_PARSER_OBJS := \
 	$(OBJ_DIR)/src/parser/wildcard_parser_bonus.o \
 	$(OBJ_DIR)/src/parser/wildcard_parser_helpers_bonus.o \
-	$(OBJ_DIR)/src/parser/wildcard_parser_helpers2_bonus.o
+	$(OBJ_DIR)/src/parser/wildcard_parser_helpers2_bonus.o \
+	$(OBJ_DIR)/src/parser/wildcard_parser_phase_bonus.o
 
 # Targets
 NAME := minishell
@@ -138,7 +139,7 @@ $(BONUS_NAME): $(OBJS) $(BONUS_PARSER_OBJS) $(BONUS_OBJS) $(LIBFT)
 	@echo "$(BOLD)$(BONUS_COLOR)╚══════════════════════════════════════════════════════════════╝$(RESET)"
 	@echo "$(DIM)$(INFO_COLOR)🚀 Compiling bonus minishell with advanced features...$(RESET)"
 	@echo "$(DIM)$(HIGHLIGHT_COLOR)🌟 Including: Wildcards, Subshells, Advanced Operators 🌟$(RESET)"
-	@$(CC) $(filter-out $(OBJ_DIR)/src/core/stubs.o $(OBJ_DIR)/src/core/wildcard.o $(OBJ_DIR)/src/parser/wildcard_parser.o $(OBJ_DIR)/src/parser/wildcard_parser_helpers.o, $(OBJS)) $(BONUS_PARSER_OBJS) $(BONUS_OBJS) -L$(LIBFT_DIR) -lft $(READLINE_LIBS) -o $@
+	@$(CC) $(filter-out $(OBJ_DIR)/src/core/stubs.o $(OBJ_DIR)/src/core/wildcard.o $(OBJ_DIR)/src/parser/wildcard_parser.o $(OBJ_DIR)/src/parser/wildcard_parser_helpers.o $(OBJ_DIR)/src/parser/parser_wildcard_phase.o, $(OBJS)) $(BONUS_PARSER_OBJS) $(BONUS_OBJS) -L$(LIBFT_DIR) -lft $(READLINE_LIBS) -o $@
 	@echo "$(BOLD)$(SUCCESS_COLOR)✅ $(BONUS_ICON) Bonus build completed successfully! $(BONUS_ICON)$(RESET)"
 	@echo "$(BOLD)$(HIGHLIGHT_COLOR)🎆 Welcome to the future of shell programming! 🎆$(RESET)"
 	@echo "$(DIM)$(BONUS_COLOR)🚀 Ready to launch into advanced shell features! 🚀$(RESET)"
@@ -163,6 +164,11 @@ $(OBJ_DIR)/src/parser/wildcard_parser_helpers2_bonus.o: bonus/src/bonus/wildcard
 
 # Bonus sources under bonus/ with BUILD_BONUS flag
 $(OBJ_DIR)/bonus/%.o: bonus/%.c
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) -DBUILD_BONUS -I./include -I./bonus/include -c $< -o $@
+
+# Special rule for parser_wildcard_phase.c with BUILD_BONUS flag for bonus build
+$(OBJ_DIR)/src/parser/wildcard_parser_phase_bonus.o: src/parser/parser_wildcard_phase.c
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -DBUILD_BONUS -I./include -I./bonus/include -c $< -o $@
 

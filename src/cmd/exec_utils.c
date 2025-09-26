@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/09/20 14:38:55 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/26 19:03:12 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,30 +96,19 @@ void	exec_proc_loop(char **paths, char **args, char **envp, t_node *node)
 	exec_proc_loop2(paths, args, envp, node);
 }
 
-void	post_wait_set_status(int pid, int background)
+char	*build_candidate(char *dir, char *cmd)
 {
-	int	status;
-	int	sig;
+	char	*path;
+	size_t	n;
 
-	if (background)
-	{
-		set_exit_status(0);
-		return ;
-	}
-	waitpid(pid, &status, 0);
-	if (WIFSIGNALED(status))
-	{
-		sig = WTERMSIG(status);
-		if (sig == SIGPIPE)
-			ft_putstr_fd(" Broken pipe\n", STDERR_FILENO);
-		set_exit_status(128 + sig);
-	}
-	else if (WIFEXITED(status))
-	{
-		set_exit_status(WEXITSTATUS(status));
-	}
-	else
-	{
-		set_exit_status(0);
-	}
+	n = ft_strlen(dir) + ft_strlen(cmd) + 2;
+	path = malloc(n);
+	if (!path)
+		return (NULL);
+	ft_strlcpy(path, dir, n);
+	ft_strlcat(path, "/", n);
+	ft_strlcat(path, cmd, n);
+	return (path);
 }
+
+/* moved to exec_utils2.c to satisfy style limits */

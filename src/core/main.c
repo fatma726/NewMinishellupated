@@ -1,12 +1,15 @@
+/*
+**
+*/
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
+/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/21 16:20:31 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/22 20:17:35 by fatima           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,12 +52,6 @@ static char	**main_loop(char **envp, t_node *n)
 		prompt = get_and_process_prompt(envp, n);
 	else
 		prompt = ft_strdup("minishell$ ");
-	set_termios();
-	if (!isatty(STDIN_FILENO) && !n->pipe_flag)
-	{
-		ft_putstr_fd(prompt, STDOUT_FILENO);
-		ft_putstr_fd("\n", STDOUT_FILENO);
-	}
 	line = get_line(prompt);
 	if (prompt)
 		free(prompt);
@@ -62,6 +59,11 @@ static char	**main_loop(char **envp, t_node *n)
 	if (!line)
 		handle_eof_exit(envp, n);
 	envp = process_command(line, envp, n);
+	if (isatty(STDIN_FILENO))
+	{
+		rl_clear_visible_line();
+		rl_reset_line_state();
+	}
 	return (envp);
 }
 
@@ -69,21 +71,18 @@ int	main(int argc, char **argv, char **envp)
 {
 	t_node		node;
 
+	(void)argc;
 	init_node(&node);
 	set_exit_status(0);
 	envp = strarrdup(envp);
-	envp = shlvl_plus_plus(setpwd(&node, envp));
+    envp = shlvl_plus_plus(setpwd(&node, envp));
+    envp = ensure_oldpwd_export(envp);
 	envp = ft_setenv_envp("_", argv[0], envp);
 	node.path_fallback = NULL;
 	node.line_nbr = 0;
 	if (!ft_getenv("PATH", envp))
 		node.path_fallback = ft_strdup("/usr/bin:/bin");
 	set_signal();
-	if (argc > 2 && !ft_strncmp(argv[1], "-c", 3))
-	{
-		argmode(NULL, argv[2], envp, &node);
-		cleanup_and_exit(NULL, envp, &node);
-	}
 	while (1)
 		envp = main_loop(envp, &node);
 }

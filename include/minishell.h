@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/20 16:32:59 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/26 19:03:12 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,13 @@ typedef struct s_global_state
 	int	signal_number;
 	int	exit_status;
 }	t_global_state;
+
+/* internal global slots struct */
+struct s_global_slots
+{
+	sig_atomic_t	signal_number;
+	int				exit_status;
+};
 
 /* enums */
 typedef enum e_message
@@ -110,18 +117,25 @@ void			clear_signal_number(void);
 void			set_signal_number(int sig);
 int				get_exit_status(void);
 void			set_exit_status(int status);
+/* internal single-slot exit-status accessor (implemented in global.c) */
+int				_ms_exit_status(int op, int value);
 
-/* bonus hooks (provided by stubs in mandatory build) */
+/* bonus hooks */
+# ifdef BUILD_BONUS
+
 char			**split_operators(char *s, char **envp, t_node *n);
 char			**subshell(char *str, char **envp, t_node *node);
 bool			check_wildcard_redirections(char **args);
 char			**expand_wildcard_if_bonus(char **a, char **e, t_node *n);
+# else
+/* mandatory build: declare only what is actually used as no-ops */
+char			**subshell(char *str, char **envp, t_node *node);
+# endif
 
 # ifdef BUILD_BONUS
 
 bool			is_redir_token(char *s);
 size_t			count_expanded_size(char **args);
-
 # endif
 
 /* cmds */
@@ -191,10 +205,11 @@ void			exec_proc_loop(char **paths, char **args, char **envp,
 					t_node *node);
 void			exec_proc_loop2(char **paths, char **args, char **envp,
 					t_node *node);
-char			**get_paths(char **envp);
+char			*build_candidate(char *dir, char *cmd);
+bool			is_builtin_command(char **args);
+bool			exec_check(char **args, char **envp, t_node *node);
 bool			is_executable(char *path);
 bool			is_directory(char *path);
-long			ft_atol(const char *str);
 long long		ft_atoll(const char *str);
 bool			ft_isalldigit(char *str);
 char			*ft_getenv(const char *name, char **envp);
@@ -202,6 +217,7 @@ int				ft_setenv_var(const char *name, const char *value,
 					int overwrite);
 char			**ft_setenv_envp(const char *name, const char *value,
 					char **envp);
+char			**ensure_oldpwd_export(char **envp);
 /* removed unused helpers newpwd/printenv/curdir/get_curdir */
 
 /* main */
@@ -210,7 +226,6 @@ char			*get_line(char *str);
 char			**get_file(int fd);
 char			*read_line_simple(void);
 // Removed internationalization - not required for evaluation
-void			argmode(char *line, char *arg, char **envp, t_node *node);
 // Removed run_commands - not required for evaluation
 void			set_signal(void);
 void			set_termios(void);
@@ -230,9 +245,7 @@ void			strarrfree(char **strs);
 
 # ifdef DEBUG_MEMORY
 
-bool			validate_env_array(char **envp);
-size_t			count_env_vars(char **envp);
-void			debug_print_env(char **envp, const char *label);
+/* Debug functions removed - not used in codebase */
 # endif
 
 size_t			strarrlen(char **strs);
@@ -241,11 +254,17 @@ char			**check_braces(char *line, char **envp, t_node *n);
 char			**get_prompt(char **envp, t_node *n);
 /* process_command helpers */
 bool			is_blank(const char *s);
+int				handle_unmatched_quotes(char *line, t_node *n);
 int				find_unquoted_oror(const char *s, t_node *n);
 char			**run_oror(char *hashed, int idx, char **envp, t_node *n);
 char			**dispatch_line(char *hashed, char **envp, t_node *n);
 
 /* parser */
+struct s_redir_copy_state
+{
+	int		i;
+	int		j;
+};
 char			*return_marked_unchanged(char *str);
 void			strip_wildmarks_inplace(char **args);
 bool			error_message(const char *token, char **envp, t_node *node);
@@ -265,6 +284,10 @@ bool			wildcard_loop(char **files, int *i, char **newargs,
 void			wildcard_handler(char **args, char **newargs, int *i,
 					t_node *node);
 char			*add_spaces_around_ampersand(char *str, t_node *node);
+char			*add_spaces_around_redirections(char *str, t_node *node);
+int				copy_double_left(char *str, char *result, int i, int *j);
+int				copy_double_right(char *str, char *result, int i, int *j);
+int				copy_single_redir(char *str, char *result, int i, int *j);
 char			**find_command(char **args, char **envp, t_node *node);
 char			**expand_wildcard(char **args, char **envp, t_node *node);
 char			*expand_wildcard_redir(char *pattern, t_node *node);
@@ -292,6 +315,8 @@ char			**rm_quotes(char **args, t_node *node);
 char			**rm_quotes_wildcards(char **args, t_node *node);
 bool			syntax_check(char **args, char **envp, t_node *node);
 void			tilde_handler(char **args, int *i, char **envp);
+char			**apply_wildcard_phase(char **args, char **envp, t_node *node,
+					char *orig);
 
 /* syntax helpers */
 const char		*check_leading_operators(char **args);
@@ -305,8 +330,8 @@ bool			check_trailing_operators_syntax(char **a);
 const char		*get_error_token(char **args);
 bool			c(char **args, int i, bool (*f1)(char *), bool (*f2)(char *));
 void			handle_syntax_error(char **envp, t_node *node);
-bool			check_invalid_operator_sequences_in_string(char *s, t_node *n);
-bool			handle_redirect_ampersand(char *str, t_node *node);
+/* check_invalid_operator_sequences_in_string removed - not defined */
+/* handle_redirect_ampersand removed - not defined */
 char			**dispatch_builtin(char **args, char **envp, t_node *node);
 
 /* pipe */
@@ -325,7 +350,7 @@ int				redir_syntax_check(char **args);
 char			**repeat(char **args, char **envp, t_node *node);
 char			**split_before_pipe_args(char **args, t_node *node);
 void			double_lmove_idx_change(char **args, int *i);
-bool			is_pipe(char *str);
+/* is_pipe removed - declared but never defined */
 bool			is_ampersand(char *str);
 
 /* redirection */
@@ -344,7 +369,7 @@ int				left_double_redir(char **args, char **envp, int *i,
 					t_node *node);
 int				print_err(char **args, int i, t_node *node);
 int				print_err2(char **args, int i);
-int				print_err3(char **args, t_node *node, int *i);
+/* print_err3 removed - not used in codebase */
 int				redir_chk(char **args);
 int				redir_excute(char **args, char **envp, t_node *node, int flag);
 int				right_redir(char **args, int *i, t_node *node);
@@ -361,6 +386,7 @@ int				left_redir_expand(char **args, int i, t_node *node,
 					char **expanded);
 void			handle_echo_skip(char **args, t_node *node);
 int				open_redir_out(char **args, int i, t_node *node, int flags);
+int				left_redir_error_public(const char *s, int type, char *tmp);
 
 /* prompt helpers */
 int				handle_escape_char(t_prompt_data *data);

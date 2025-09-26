@@ -24,6 +24,8 @@ void	exec_child(char **args, char **envp, t_node *node)
 	if (!node->right_flag)
 		dup2(node->fds[1], STDOUT_FILENO);
 	close(node->fds[1]);
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
 	signal(SIGPIPE, SIG_DFL);
 	if (!node->child_die)
 	{
@@ -43,6 +45,9 @@ void	exec_parents(char **args, char **envp, t_node *node)
 	dup2(node->fds[0], STDIN_FILENO);
 	close(node->fds[0]);
 	node->pipe_flag = 0;
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
+	signal(SIGPIPE, SIG_DFL);
 	envp = repeat(args, envp, node);
 	backup_restor(node);
 }
@@ -91,5 +96,6 @@ void	init_node(t_node *node)
 	node->redir_idx = 0;
 	node->redir_stop = 0;
 	node->right_flag = 0;
+	node->redir_fd = -1;
 	node->cmd = NULL;
 }

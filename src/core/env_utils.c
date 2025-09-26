@@ -62,8 +62,13 @@ char	**shlvl_mod(int mod, char **envp)
 {
 	int		newval;
 	char	*tmp;
+	char	*shlvl_env;
 
-	newval = ft_atoi(ft_getenv("SHLVL", envp)) + mod;
+	shlvl_env = ft_getenv("SHLVL", envp);
+	if (shlvl_env)
+		newval = ft_atoi(shlvl_env) + mod;
+	else
+		newval = 1 + mod;
 	if (newval > 1000)
 		newval = 1;
 	if (newval < 0)

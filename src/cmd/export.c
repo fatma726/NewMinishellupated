@@ -28,7 +28,7 @@ static void	print_declare_line(char *entry)
 		value = NULL;
 	ft_putstr_fd("declare -x ", STDOUT_FILENO);
 	ft_putstr_fd(name, STDOUT_FILENO);
-	if (value && (value[0] || ft_strncmp(name, "OLDPWD", 7)))
+	if (value)
 	{
 		ft_putstr_fd("=\"", STDOUT_FILENO);
 		print_escaped_value(value);
@@ -67,8 +67,6 @@ static void	print_sorted_env(char **envp)
 char	**export_print(char **envp)
 {
 	print_sorted_env(envp);
-	if (!ft_getenv("OLDPWD", envp))
-		ft_putstr_fd("declare -x OLDPWD\n", STDOUT_FILENO);
 	fflush(stdout);
 	return (envp);
 }

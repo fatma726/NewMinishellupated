@@ -28,7 +28,7 @@ static void	handle_redirection_chars(int *i, char *str, char *str2)
 		if (str[i[0]] == '<' || str[i[0]] == '>')
 		{
 			str2[i[1]++] = str[i[0]++];
-			if (str[i[0]] == '<' && str[i[0] - 1] != '>')
+			if (str[i[0]] == '<' && str[i[0] - 1] == '<')
 				str2[i[1]++] = str[i[0]++];
 		}
 	}
@@ -39,7 +39,8 @@ static void	no_env(int *i, char *str, char *str2)
 {
 	if (!i[3]
 		&& (ft_strchr("<>|", str[i[0]])
-			|| (str[i[0]] == '2' && str[i[0] + 1] == '>')))
+			|| (str[i[0]] == '2' && str[i[0] + 1] == '>')
+			|| (str[i[0]] == '<' && str[i[0] + 1] == '<')))
 		handle_redirection_chars(i, str, str2);
 	else
 		str2[i[1]++] = str[i[0]++];

@@ -12,30 +12,52 @@
 
 #include "minishell.h"
 
-bool	is_blank(const char *s)
+static int	check_quote_state(char *line, int *quote_state, char *quote_char)
 {
-	int			i;
+	int	i;
 
 	i = 0;
-	while (s && s[i])
+	while (line[i])
 	{
-		if (s[i] != ' ' && s[i] != '\t' && s[i] != '\r'
-			&& s[i] != '\v' && s[i] != '\f')
-			return (false);
+		if (line[i] == '\'' || line[i] == '"')
+		{
+			if (*quote_state == 0)
+			{
+				*quote_state = 1;
+				*quote_char = line[i];
+			}
+			else if (line[i] == *quote_char)
+				*quote_state = 0;
+		}
 		i++;
 	}
-	return (true);
+	return (i);
 }
 
-int	find_unquoted_oror(const char *s, t_node *n)
+static void	print_quote_error(char quote_char, t_node *n)
 {
-	int			i;
+	ft_putstr_fd("minishell: unexpected EOF while looking for matching `",
+		STDERR_FILENO);
+	ft_putchar_fd(quote_char, STDERR_FILENO);
+	ft_putendl_fd("'", STDERR_FILENO);
+	set_exit_status(2);
+	n->syntax_flag = true;
+}
 
-	i = -1;
-	while (s && s[++i])
-		if (!quote_check(s, i, n) && s[i] == '|' && s[i + 1] == '|')
-			return (i);
-	return (-1);
+int	handle_unmatched_quotes(char *line, t_node *n)
+{
+	int		quote_state;
+	char	quote_char;
+
+	quote_state = 0;
+	check_quote_state(line, &quote_state, &quote_char);
+	if (quote_state != 0)
+	{
+		print_quote_error(quote_char, n);
+		free(line);
+		return (1);
+	}
+	return (0);
 }
 
 char	**run_oror(char *hashed, int idx, char **envp, t_node *n)
@@ -88,30 +110,4 @@ char	**dispatch_line(char *hashed, char **envp, t_node *n)
 	if (idx >= 0)
 		return (run_oror(hashed, idx, envp, n));
 	return (subshell(hashed, envp, n));
-}
-
-char	**check_braces(char *line, char **envp, t_node *n)
-{
-	int	i;
-
-	i = 0;
-	while (line[i] && ft_strchr(" \t", line[i]))
-		i++;
-	if (line[i] == '{')
-	{
-		ft_putendl_fd("minishell: unexpected end of file", STDERR_FILENO);
-		set_exit_status(2);
-		n->syntax_flag = true;
-		return (free(line), envp);
-	}
-	if (line[i] == '}')
-	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `",
-			STDERR_FILENO);
-		ft_putendl_fd("}'", STDERR_FILENO);
-		set_exit_status(2);
-		n->syntax_flag = true;
-		return (free(line), envp);
-	}
-	return (NULL);
 }

@@ -26,16 +26,7 @@ static int	left_redir_post(char **args, char **envp, int *i, t_node *node)
 	return (0);
 }
 
-static int	handle_heredoc_cleanup(char **args, int *i)
-{
-	while (args[*i + 2])
-	{
-		free(args[*i + 2]);
-		args[*i + 2] = NULL;
-		(*i)++;
-	}
-	return (0);
-}
+/* handle_heredoc_cleanup removed - unused function */
 
 int	left_redir(char **args, char **envp, int *i, t_node *node)
 {
@@ -65,25 +56,29 @@ int	left_redir(char **args, char **envp, int *i, t_node *node)
 
 int	left_double_redir(char **args, char **envp, int *i, t_node *node)
 {
-	if (setup_heredoc_file(node))
-		return (1);
-	if (isdlr(node->ori_args[*i]))
+	if (isdlr(node->ori_args[*i]) || istlr(node->ori_args[*i]))
 	{
-		if (!isatty(STDIN_FILENO)
-			&& (!args[*i + 2] || isp(node->ori_args[*i + 2])))
-			(void)envp;
-		else
-			heredoc_loop(args, envp, i, node);
+		if (!args[*i + 1] || !args[*i + 1][0])
+		{
+			ft_putstr_fd("minishell: syntax error near unexpected token `",
+				STDERR_FILENO);
+			ft_putstr_fd("newline", STDERR_FILENO);
+			ft_putendl_fd("'", STDERR_FILENO);
+			set_exit_status(2);
+			node->redir_stop = 1;
+			return (1);
+		}
+		if (!isatty(STDIN_FILENO) && !node->cmd)
+		{
+			*i += 2;
+			return (0);
+		}
+		if (setup_heredoc_file(node))
+			return (1);
+		heredoc_loop(args, envp, i, node);
+		cleanup_heredoc_file(node);
+		*i += 2;
+		return (unlink(".temp") == -1);
 	}
-	else
-		ft_putendl_fd(args[*i + 1], node->redir_fd);
-	cleanup_heredoc_file(node);
-	if (!node->cmd && args[*i + 2]
-		&& !is_redir_check(node->ori_args[*i + 2])
-		&& !exec_check(args + 2, envp, node))
-		return (handle_heredoc_cleanup(args, i));
-	double_lmove_idx_change(args, i);
-	*i += 1;
-	double_lmove_idx_change(node->ori_args, i);
-	return (unlink(".temp") == -1);
+	return (0);
 }

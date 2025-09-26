@@ -78,11 +78,11 @@ char	*hash_handler(char *str, t_node *node)
 	unsigned int	i;
 	char			*new_str;
 
-    if (isatty(STDIN_FILENO) && ft_strlen(str) && ft_strlen(str) < 1000)
-    {
-        add_history(str);
-        limit_history_size();
-    }
+	if (isatty(STDIN_FILENO) && ft_strlen(str) && ft_strlen(str) < 1000)
+	{
+		add_history(str);
+		limit_history_size();
+	}
 	node->syntax_flag = false;
 	i = 0;
 	while (str[i] && (str[i] != '#' || quote_check(str, (int)i, node)

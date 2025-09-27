@@ -70,7 +70,7 @@ int	open_redir_out(char **args, int i, t_node *node, int flags)
 	expanded_path = expand_wildcard_redir(args[i + 1], node);
 	if (!expanded_path)
 	{
-		ft_putstr_fd("bash: ", STDERR_FILENO);
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		ft_putstr_fd(args[i + 1], STDERR_FILENO);
 		ft_putendl_fd(": ambiguous redirect", STDERR_FILENO);
 		set_exit_status(1);

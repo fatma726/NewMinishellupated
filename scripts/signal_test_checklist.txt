@@ -1,0 +1,21 @@
+Signal manual test checklist
+
+- Ctrl-C at prompt: Press Ctrl-C on an empty prompt.
+  - Expect: newline, prompt refresh, exit status becomes 130.
+  - Verify: type `echo $?` and see `130`.
+
+- Ctrl-C during running job: Run `sleep 5`, press Ctrl-C.
+  - Expect: `sleep` stops immediately, prompt returns, exit status 130.
+  - Verify: `echo $?` prints `130`.
+
+- Ctrl-\ at prompt: Press Ctrl-\ on an empty prompt.
+  - Expect: prompt remains, no `Quit: 3` message.
+
+- Ctrl-\ during job: Run `cat` (waits for input), press Ctrl-\.
+  - Expect: foreground `cat` receives SIGQUIT; reference bash prints `Quit: 3`.
+  - Our minishell prints `Quit: 3` when the child is signaled with SIGQUIT.
+
+- Ctrl-D at prompt (EOF): Press Ctrl-D on empty prompt.
+  - Expect: shell exits with last exit status.
+  - Verify: run `false`, then Ctrl-D; parent process exit code should be 1.
+

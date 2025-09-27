@@ -6,14 +6,14 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/26 19:03:12 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/27 12:18:52 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# define MSTEST_MODE 0
+/* Non-interactive/-c modes removed to align with subject */
 
 /* includes */
 # include <dirent.h>
@@ -139,8 +139,8 @@ size_t			count_expanded_size(char **args);
 # endif
 
 /* cmds */
-void			checkdot(char **args, char **envp);
-void			chkdir(char **args, char **envp, bool end);
+void			checkdot(char **args, char **envp, t_node *node);
+void			chkdir(char **args, char **envp, bool end, t_node *node);
 void			handle_env_i_option(char **args, char **envs, t_node *node);
 /* alias features removed (not part of mandatory/bonus) */
 char			**cmd_cd(char **args, char **envp, t_node *node);
@@ -165,6 +165,7 @@ void			handle_exit_message(void);
 void			handle_numeric_error(char *arg);
 void			handle_too_many_args(void);
 bool			handle_exit_with_args(char **args);
+void			cleanup_child_and_exit(char **args, char **envp, t_node *node);
 void			cleanup_and_exit(char **args, char **envp, t_node *node);
 void			handle_eof_exit(char **envp, t_node *node);
 char			**cmd_export(char **args, char **envp, t_node *node);
@@ -195,7 +196,8 @@ bool			is_valid_identifier_char_unset(char c);
 void			post_wait_set_status(int pid, int background);
 bool			exec_check_loop(char **paths, char **args);
 bool			exec_check(char **args, char **envp, t_node *node);
-void			exec_error(char **args, char **envp, char **paths);
+void			exec_error(char **args, char **envp, char **paths,
+					t_node *node);
 void			exec_proc(char **args, char **envp, t_node *node);
 char			**exec_pipe(char *path, char **args, char **envp,
 					t_node *node);
@@ -207,7 +209,6 @@ void			exec_proc_loop2(char **paths, char **args, char **envp,
 					t_node *node);
 char			*build_candidate(char *dir, char *cmd);
 bool			is_builtin_command(char **args);
-bool			exec_check(char **args, char **envp, t_node *node);
 bool			is_executable(char *path);
 bool			is_directory(char *path);
 long long		ft_atoll(const char *str);
@@ -224,7 +225,7 @@ char			**ensure_oldpwd_export(char **envp);
 // Removed internationalization - not required for evaluation
 char			*get_line(char *str);
 char			**get_file(int fd);
-char			*read_line_simple(void);
+/* Non-interactive input helpers removed */
 // Removed internationalization - not required for evaluation
 // Removed run_commands - not required for evaluation
 void			set_signal(void);
@@ -250,7 +251,10 @@ void			strarrfree(char **strs);
 
 size_t			strarrlen(char **strs);
 char			**process_command(char *line, char **envp, t_node *n);
-char			**check_braces(char *line, char **envp, t_node *n);
+char			**check_standalone_operators(
+					char *line, char **envp, t_node *n);
+char			**check_braces(
+					char *line, char **envp, t_node *n);
 char			**get_prompt(char **envp, t_node *n);
 /* process_command helpers */
 bool			is_blank(const char *s);
@@ -309,6 +313,8 @@ bool			isrr(char *str);
 bool			istlr(char *str);
 bool			isdp(char *str);
 bool			isda(char *str);
+bool			is_open_paren(char *str);
+bool			is_close_paren(char *str);
 char			**parser(char *str, char **envp, t_node *node);
 int				quote_check(char const *s, int i, t_node *node);
 char			**rm_quotes(char **args, t_node *node);

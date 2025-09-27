@@ -14,7 +14,7 @@
 
 static void	handle_invalid_identifier(char *arg)
 {
-	char	unset_error[25];
+	char	unset_error[35];
 	char	not_valid[30];
 
 	ft_strlcpy(unset_error, "minishell: unset: `", 25);

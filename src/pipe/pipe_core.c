@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/20 19:07:17 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/26 21:25:07 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	exec_child(char **args, char **envp, t_node *node)
 		envp = shlvl_mod(-1, envp);
 		strarrfree(child_args);
 	}
-	exit(get_exit_status());
+	cleanup_child_and_exit(args, envp, node);
 }
 
 void	exec_parents(char **args, char **envp, t_node *node)

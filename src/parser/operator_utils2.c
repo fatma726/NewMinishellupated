@@ -1,33 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   input_helpers.c                                    :+:      :+:    :+:   */
+/*   operator_utils2.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 1970/01/01 00:00:00 by fatmtahmdabrahym #+#    #+#             */
-/*   Updated: 2025/01/29 19:31:40 by fatmtahmdabrahym ###   ########.fr       */
+/*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
+/*   Updated: 2025/09/27 13:55:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <readline/readline.h>
-#include <readline/history.h>
 
-void	handle_eof_exit(char **envp, t_node *node)
+bool	is_open_paren(char *str)
 {
-	if (node)
-	{
-		if (node->pwd)
-			free(node->pwd);
-		if (node->path_fallback)
-			free(node->path_fallback);
-	}
-	if (envp)
-		strarrfree(envp);
-	clear_history();
-	restore_termios();
-	exit(get_exit_status());
+	return (str && !ft_strncmp(str, "(", 2));
 }
 
-/* Non-interactive read helpers removed */
+bool	is_close_paren(char *str)
+{
+	return (str && !ft_strncmp(str, ")", 2));
+}

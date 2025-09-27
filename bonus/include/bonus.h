@@ -15,17 +15,33 @@
 
 # include "minishell.h"
 
+/* Internal scanner context for wrapped groups */
+typedef struct s_wrap_scan
+{
+	char		*s;
+	t_node		*n;
+	size_t		l;
+	size_t		r;
+	size_t		*inner_start;
+	size_t		*inner_len;
+}	t_wrap_scan;
+
 /* Logical operators and parentheses */
 char	**split_operators(char *s, char **envp, t_node *n);
+char	**split_operators_tail(char *s, size_t i, char **envp, t_node *n);
 bool	check_redirection_syntax(char *s, t_node *n);
 bool	is_operator_pair(char *s, size_t i, t_node *n);
+void	advance_to(char *s, size_t *i, t_node *n, char op);
+int		find_top_level_op(char *s, t_node *n);
+int		is_wrapped_group(char *s, t_node *n,
+			size_t *inner_start, size_t *inner_len);
 bool	starts_invalid(char *s, size_t i);
 bool	has_triple_ops(char *s, size_t i);
 bool	has_mixed_op_error(char *s, t_node *n);
 bool	handle_invalid_start_and_report(char *s, size_t i, t_node *n);
 bool	syntax_err_pair(char *s, size_t i, t_node *n, int pair);
 char	*handle_triple_redir_error(char *str, t_node *node);
-char	*handle_paren_error(char *str, int count);
+char	*handle_paren_error(char *str, int count, t_node *node);
 
 /* Wildcard helpers */
 int		count_matching_files(char *pattern);

@@ -1,33 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   input_helpers.c                                    :+:      :+:    :+:   */
+/*   process_command_dispatch.c                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatmtahmdabrahym #+#    #+#             */
-/*   Updated: 2025/01/29 19:31:40 by fatmtahmdabrahym ###   ########.fr       */
+/*   Updated: 2025/09/27 17:13:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <readline/readline.h>
-#include <readline/history.h>
 
-void	handle_eof_exit(char **envp, t_node *node)
+char	**dispatch_line(char *hashed, char **envp, t_node *n)
 {
-	if (node)
-	{
-		if (node->pwd)
-			free(node->pwd);
-		if (node->path_fallback)
-			free(node->path_fallback);
-	}
-	if (envp)
-		strarrfree(envp);
-	clear_history();
-	restore_termios();
-	exit(get_exit_status());
-}
+	int			idx;
+	int			i;
 
-/* Non-interactive read helpers removed */
+	i = 0;
+	while (hashed[i] && (hashed[i] == ' ' || hashed[i] == '\t'))
+		i++;
+	if (hashed[i] == ';')
+	{
+		ft_putstr_fd("minishell: syntax error near unexpected token `",
+			STDERR_FILENO);
+		ft_putendl_fd(";'", STDERR_FILENO);
+		set_exit_status(2);
+		n->syntax_flag = true;
+		free(hashed);
+		return (envp);
+	}
+	idx = find_unquoted_oror(hashed, n);
+	if (idx >= 0)
+		return (run_oror(hashed, idx, envp, n));
+	return (subshell(hashed, envp, n));
+}

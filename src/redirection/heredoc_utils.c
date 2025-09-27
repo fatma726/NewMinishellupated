@@ -12,36 +12,8 @@
 
 #include "minishell.h"
 
-static char	*get_heredoc_line_noninteractive(void)
-{
-	char	*line;
-	char	buffer[1024];
-	int		i;
-	ssize_t	bytes_read;
-
-	line = malloc(1024);
-	if (!line)
-		return (NULL);
-	i = 0;
-	bytes_read = read(STDIN_FILENO, buffer, 1);
-	while (bytes_read > 0)
-	{
-		if (buffer[0] == '\n' || i >= 1023)
-			break ;
-		line[i++] = buffer[0];
-		bytes_read = read(STDIN_FILENO, buffer, 1);
-	}
-	if (i == 0)
-	{
-		free(line);
-		return (NULL);
-	}
-	line[i] = '\0';
-	return (line);
-}
-
 static void	write_heredoc_line(bool expand_vars, char *line,
-					char **envp, t_node *node)
+						char **envp, t_node *node)
 {
 	char	*expanded_line;
 
@@ -54,14 +26,15 @@ static void	write_heredoc_line(bool expand_vars, char *line,
 		free(expanded_line);
 	}
 	else
+	{
 		ft_putendl_fd(line, node->redir_fd);
+		free(line);
+	}
 }
 
 static char	*get_heredoc_line(void)
 {
-	if (isatty(STDIN_FILENO))
-		return (readline("> "));
-	return (get_heredoc_line_noninteractive());
+	return (readline("> "));
 }
 
 static int	process_heredoc_input(char *delimiter, bool expand_vars,
@@ -80,7 +53,6 @@ static int	process_heredoc_input(char *delimiter, bool expand_vars,
 			break ;
 		}
 		write_heredoc_line(expand_vars, line, envp, node);
-		free(line);
 	}
 	return (0);
 }

@@ -89,24 +89,10 @@ static char	*get_continuation_line(char *prompt)
 char	*get_line(char *str)
 {
 	char	*line;
-	char	*line2;
 	char	*prompt;
 
-	if (isatty(STDIN_FILENO))
-	{
-		prompt = ft_strdup(str);
-		line = get_continuation_line(prompt);
-		free(prompt);
-	}
-	else if (MSTEST_MODE)
-		line = readline(NULL);
-	else
-	{
-		line2 = read_line_simple();
-		if (!line2)
-			return (NULL);
-		line = ft_strtrim(line2, "\n");
-		free(line2);
-	}
+	prompt = ft_strdup(str);
+	line = get_continuation_line(prompt);
+	free(prompt);
 	return (line);
 }

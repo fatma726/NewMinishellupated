@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/23 12:16:26 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/27 16:53:56 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 bool	is_blank(const char *s)
 {
-	int			i;
+	int	i;
 
 	i = 0;
 	while (s && s[i])
@@ -62,6 +62,8 @@ void	set_termios(void)
 	struct termios	termios;
 	struct termios	original;
 
+	if (!isatty(STDIN_FILENO))
+		return ;
 	if (tcgetattr(STDIN_FILENO, &original) == 0)
 	{
 		termios = original;
@@ -74,6 +76,8 @@ void	restore_termios(void)
 {
 	struct termios	original;
 
+	if (!isatty(STDIN_FILENO))
+		return ;
 	if (tcgetattr(STDIN_FILENO, &original) == 0)
 	{
 		original.c_lflag |= (tcflag_t)ECHOCTL;

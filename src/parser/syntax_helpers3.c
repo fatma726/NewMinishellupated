@@ -91,8 +91,12 @@ const char	*get_error_token(char **args)
 		i++;
 	}
 	if (i > 0 && args[i])
+	{
+		if (is_open_paren(args[i]) || is_close_paren(args[i]))
+			return (args[i]);
 		if (isp(args[i]) || islr(args[i]) || isrr(args[i]) || isdlr(args[i])
 			|| isdp(args[i]) || isda(args[i]) || is_ampersand(args[i]))
 			return ("newline");
+	}
 	return ("newline");
 }

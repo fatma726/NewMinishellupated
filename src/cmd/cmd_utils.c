@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/20 13:30:00 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/26 21:25:07 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,9 @@
 
 static char	**get_paths(char *path_env, t_node *node)
 {
+	(void)node;
 	if (!path_env || !path_env[0])
-	{
-		if (node->path_fallback)
-			return (ft_split(node->path_fallback, ':'));
-		return (ft_split("/usr/bin:/bin", ':'));
-	}
+		return (NULL);
 	return (ft_split(path_env, ':'));
 }
 
@@ -29,7 +26,7 @@ static void	handle_slash_command(char **args, char **envp, t_node *node)
 	{
 		if (!access(args[0], X_OK))
 			envp = exec_pipe(args[0], args, envp, node);
-		chkdir(args, envp, 1);
+		chkdir(args, envp, 1, node);
 	}
 }
 
@@ -69,8 +66,8 @@ void	exec_proc(char **args, char **envp, t_node *node)
 	char	*path_env;
 
 	if (!args[0][0])
-		exec_error(args, envp, 0);
-	checkdot(args, envp);
+		exec_error(args, envp, 0, node);
+	checkdot(args, envp, node);
 	handle_slash_command(args, envp, node);
 	path_env = ft_getenv("PATH", envp);
 	paths = get_paths(path_env, node);
@@ -79,5 +76,5 @@ void	exec_proc(char **args, char **envp, t_node *node)
 	node->i = -1;
 	while (paths[++(node->i)])
 		exec_proc_loop(paths, args, envp, node);
-	exec_error(args, envp, paths);
+	exec_error(args, envp, paths, node);
 }

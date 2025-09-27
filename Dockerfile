@@ -14,8 +14,7 @@ WORKDIR /workspace
 # Copy project files
 COPY . .
 
-# Build the project
-RUN make clean && make
+# Don't pre-build - will compile fresh for correct architecture
 
 # Default command
 CMD ["bash"]

@@ -1,0 +1,258 @@
+# Linux readline library suppression file for Valgrind
+# Suppresses false positives from readline library on Linux
+
+{
+   <readline-init-malloc>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:readline
+}
+
+{
+   <readline-init-calloc>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   ...
+   fun:readline
+}
+
+{
+   <readline-init-realloc>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:realloc
+   ...
+   fun:readline
+}
+
+{
+   <add-history-malloc>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:add_history
+}
+
+{
+   <add-history-strdup>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:__strdup
+   ...
+   fun:add_history
+}
+
+{
+   <readline-completion-malloc>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:rl_complete*
+}
+
+{
+   <readline-filename-completion>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:rl_filename_completion_function
+}
+
+{
+   <readline-username-completion>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:rl_username_completion_function
+}
+
+{
+   <readline-insert-text>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:rl_insert_text
+}
+
+{
+   <readline-variable-bind>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:rl_variable_bind
+}
+
+{
+   <readline-parse-and-bind>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:rl_parse_and_bind
+}
+
+{
+   <readline-read-init-file>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:rl_read_init_file
+}
+
+{
+   <clear-history>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:clear_history
+}
+
+{
+   <read-history>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:read_history
+}
+
+{
+   <write-history>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:write_history
+}
+
+{
+   <history-expand>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:history_expand
+}
+
+{
+   <readline-terminal-init>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:_rl_init_terminal_io
+}
+
+{
+   <readline-keymap-malloc>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:rl_make_keymap
+}
+
+{
+   <readline-set-keymap>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:rl_set_keymap
+}
+
+{
+   <readline-generic-bind>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:rl_generic_bind
+}
+
+{
+   <readline-macro-bind>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:rl_macro_bind
+}
+
+{
+   <readline-function-dumper>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:rl_function_dumper
+}
+
+{
+   <libreadline-leak>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   obj:*/libreadline*.so*
+}
+
+{
+   <libreadline-conditional>
+   Memcheck:Cond
+   ...
+   obj:*/libreadline*.so*
+}
+
+{
+   <libreadline-value4>
+   Memcheck:Value4
+   ...
+   obj:*/libreadline*.so*
+}
+
+{
+   <libreadline-value8>
+   Memcheck:Value8
+   ...
+   obj:*/libreadline*.so*
+}
+
+{
+   <libhistory-leak>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   obj:*/libhistory*.so*
+}
+
+{
+   <tgetent-termcap>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:tgetent
+}
+
+{
+   <tputs-termcap>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:tputs
+}

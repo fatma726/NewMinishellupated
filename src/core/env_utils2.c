@@ -17,7 +17,7 @@ static void	handle_shell_level_warning(int level)
 	char	warning_msg[50];
 	char	reset_msg[30];
 
-	ft_strlcpy(warning_msg, "bash: warning: shell level (", 50);
+	ft_strlcpy(warning_msg, "minishell: warning: shell level (", 50);
 	ft_strlcpy(reset_msg, ") too high, resetting to 1", 30);
 	ft_putstr_fd(warning_msg, STDERR_FILENO);
 	ft_putnbr_fd(level, STDERR_FILENO);

@@ -18,13 +18,13 @@ int	left_redir_error_public(const char *s, int type, char *tmp)
 {
 	if (type == 0)
 	{
-		ft_putstr_fd("bash: ", STDERR_FILENO);
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		ft_putstr_fd(s, STDERR_FILENO);
 		ft_putendl_fd(": ambiguous redirect", STDERR_FILENO);
 	}
 	else
 	{
-		ft_putstr_fd("bash: ", STDERR_FILENO);
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		ft_putstr_fd(s, STDERR_FILENO);
 		ft_putendl_fd(": No such file or directory", STDERR_FILENO);
 	}

@@ -42,7 +42,7 @@ void	handle_exit_message(void)
 
 void	handle_numeric_error(char *arg)
 {
-	char	exit_error[20];
+	char	exit_error[30];
 	char	numeric_error[30];
 
 	set_exit_status(255);
@@ -55,7 +55,7 @@ void	handle_numeric_error(char *arg)
 
 void	handle_too_many_args(void)
 {
-	char	too_many[37];
+	char	too_many[47];
 
 	set_exit_status(EXIT_FAILURE);
 	ft_strlcpy(too_many, "minishell: exit: too many arguments\n", 37);
@@ -73,12 +73,10 @@ void	cmd_exit(char **args, char **envp, t_node *node)
 		should_exit = handle_exit_with_args(args);
 	else
 		set_exit_status(EXIT_SUCCESS);
-	if (should_exit && isatty(STDIN_FILENO) && !node->argmode)
+	if (should_exit && !node->argmode)
 		handle_exit_message();
 	if (should_exit)
 	{
-		if (!isatty(STDIN_FILENO) && !node->argmode)
-			return ;
 		cleanup_and_exit(args, envp, node);
 	}
 }

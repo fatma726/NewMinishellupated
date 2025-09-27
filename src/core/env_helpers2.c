@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   input_helpers.c                                    :+:      :+:    :+:   */
+/*   env_helpers.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -11,23 +11,27 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <readline/readline.h>
-#include <readline/history.h>
 
-void	handle_eof_exit(char **envp, t_node *node)
+static bool	env_has_key_any(char **envp, const char *name)
 {
-	if (node)
+	int			i;
+	size_t		len;
+
+	len = ft_strlen(name);
+	i = 0;
+	while (envp[i])
 	{
-		if (node->pwd)
-			free(node->pwd);
-		if (node->path_fallback)
-			free(node->path_fallback);
+		if (!ft_strncmp(envp[i], name, len)
+			&& (envp[i][len] == '=' || envp[i][len] == '\0'))
+			return (true);
+		i++;
 	}
-	if (envp)
-		strarrfree(envp);
-	clear_history();
-	restore_termios();
-	exit(get_exit_status());
+	return (false);
 }
 
-/* Non-interactive read helpers removed */
+char	**ensure_oldpwd_export(char **envp)
+{
+	if (!env_has_key_any(envp, "OLDPWD"))
+		envp = ft_setenv_envp("OLDPWD", NULL, envp);
+	return (envp);
+}

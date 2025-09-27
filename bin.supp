@@ -1,0 +1,189 @@
+# Linux system library suppression file for Valgrind in Docker
+# Suppresses false positives from Linux system libraries
+
+{
+   <glibc-malloc>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   obj:*/libc-*.so
+}
+
+{
+   <glibc-calloc>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   ...
+   obj:*/libc-*.so
+}
+
+{
+   <glibc-realloc>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:realloc
+   ...
+   obj:*/libc-*.so
+}
+
+{
+   <ld-linux-loader>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   obj:*/ld-*.so*
+}
+
+{
+   <ld-linux-conditional>
+   Memcheck:Cond
+   ...
+   obj:*/ld-*.so*
+}
+
+{
+   <libdl-leak>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   obj:*/libdl*.so*
+}
+
+{
+   <libpthread-leak>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   obj:*/libpthread*.so*
+}
+
+{
+   <libm-leak>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   obj:*/libm*.so*
+}
+
+{
+   <gconv-modules>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:__gconv_*
+}
+
+{
+   <locale-leak>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:setlocale
+}
+
+{
+   <locale-categories>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:_nl_*
+}
+
+{
+   <nss-leak>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   obj:*/libnss_*.so*
+}
+
+{
+   <resolv-leak>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   obj:*/libresolv*.so*
+}
+
+{
+   <terminfo-leak>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:_nc_*
+}
+
+{
+   <ncurses-leak>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   obj:*/libncurses*.so*
+}
+
+{
+   <tinfo-leak>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   obj:*/libtinfo*.so*
+}
+
+{
+   <getpwuid-leak>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:getpwuid*
+}
+
+{
+   <getpwnam-leak>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:getpwnam*
+}
+
+{
+   <getgrnam-leak>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:getgrnam*
+}
+
+{
+   <bash-completion>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   obj:*/bash
+}
+
+{
+   <system-getenv>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:getenv
+}

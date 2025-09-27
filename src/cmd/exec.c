@@ -12,10 +12,6 @@
 
 #include "minishell.h"
 
-// Removed background processing - not required for evaluation
-
-// Removed SHLVL adjustment - not required for evaluation
-
 bool	exec_check_loop(char **paths, char **args)
 {
 	size_t	i;
@@ -47,20 +43,15 @@ bool	exec_check(char **args, char **envp, t_node *node)
 	bool	ret;
 	char	*path_env;
 
+	(void)node;
 	if (is_builtin_command(args))
 		return (true);
 	path_env = ft_getenv("PATH", envp);
 	if (!path_env || !path_env[0])
-	{
-		if (node->path_fallback)
-			paths = ft_split(node->path_fallback, ':');
-		else
-			paths = ft_split("/usr/bin:/bin", ':');
-	}
-	else
-		paths = ft_split(path_env, ':');
+		return (false);
+	paths = ft_split(path_env, ':');
 	if (!paths)
-		exit(EXIT_FAILURE);
+		return (false);
 	ret = exec_check_loop(paths, args);
 	strarrfree(paths);
 	return (ret);
@@ -74,7 +65,10 @@ static void	handle_signaled_status(int status)
 	if (sig == SIGQUIT)
 		ft_putstr_fd("Quit: 3\n", STDOUT_FILENO);
 	else if (sig == SIGPIPE)
-		ft_putstr_fd(" Broken pipe\n", STDERR_FILENO);
+	{
+		if (isatty(STDIN_FILENO))
+			ft_putstr_fd(" Broken pipe\n", STDERR_FILENO);
+	}
 	set_exit_status(128 + sig);
 }
 

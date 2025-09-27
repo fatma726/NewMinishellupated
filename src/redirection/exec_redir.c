@@ -89,10 +89,7 @@ int	exec_redir(char **args, char **envp, t_node *node)
 
 int	print_err2(char **args, int i)
 {
-	char	bash_line[20];
-
-	ft_strlcpy(bash_line, "bash: line 1: ", 20);
-	ft_putstr_fd(bash_line, STDERR_FILENO);
+	ft_putstr_fd("minishell: ", STDERR_FILENO);
 	errno = ENOENT;
 	ft_putstr_fd(args[i + 2], STDERR_FILENO);
 	ft_putstr_fd(": ", STDERR_FILENO);

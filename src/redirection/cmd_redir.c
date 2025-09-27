@@ -68,16 +68,12 @@ int	left_double_redir(char **args, char **envp, int *i, t_node *node)
 			node->redir_stop = 1;
 			return (1);
 		}
-		if (!isatty(STDIN_FILENO) && !node->cmd)
-		{
-			*i += 2;
-			return (0);
-		}
 		if (setup_heredoc_file(node))
 			return (1);
 		heredoc_loop(args, envp, i, node);
 		cleanup_heredoc_file(node);
-		*i += 2;
+		move_redir_args(args, node->ori_args, i);
+		*i -= 1;
 		return (unlink(".temp") == -1);
 	}
 	return (0);

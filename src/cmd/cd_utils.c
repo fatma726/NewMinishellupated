@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/09/20 14:27:47 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/27 13:11:10 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ bool	handle_oldpwd_cd(char **args, char **envp, t_node *node, int offset)
 
 bool	handle_chdir_error(char **args, int offset)
 {
-	char	chdir_error[50];
+	char	chdir_error[60];
 
 	set_exit_status(EXIT_FAILURE);
 	ft_strlcpy(chdir_error, "minishell: cd: ", 50);

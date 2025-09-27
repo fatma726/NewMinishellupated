@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/09/26 19:03:12 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/26 21:25:07 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	exec_nopath(t_node *node, char **args, char **envp, char **paths)
 		execve(args[0], args, envp);
 	}
 	free(test2);
-	exec_error(args, envp, paths);
+	exec_error(args, envp, paths, node);
 }
 
 char	**exec_pipe(char *path, char **args, char **envp, t_node *node)
@@ -73,7 +73,7 @@ void	exec_proc_loop2(char **paths, char **args, char **envp, t_node *node)
 	}
 	temp[0] = node->path;
 	temp[1] = 0;
-	chkdir(temp, envp, 0);
+	chkdir(temp, envp, 0, node);
 	free(node->path);
 	free(temp);
 }
@@ -86,9 +86,9 @@ void	exec_proc_loop(char **paths, char **args, char **envp, t_node *node)
 	node->path = malloc(n);
 	if (!(node->path))
 	{
-		strarrfree(envp);
 		strarrfree(paths);
-		exit(EXIT_FAILURE);
+		set_exit_status(EXIT_FAILURE);
+		cleanup_child_and_exit(NULL, envp, node);
 	}
 	ft_strlcpy(node->path, paths[node->i], n);
 	ft_strlcat(node->path, "/", n);

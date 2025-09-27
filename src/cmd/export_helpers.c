@@ -38,7 +38,7 @@ bool	is_valid_identifier_char(char c)
 
 void	print_invalid_identifier_error(char *arg)
 {
-	char	export_error[25];
+	char	export_error[35];
 	char	not_valid[30];
 
 	ft_strlcpy(export_error, "minishell: export: `", 25);

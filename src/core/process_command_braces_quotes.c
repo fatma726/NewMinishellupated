@@ -1,20 +1,53 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   process_command_helpers.c                          :+:      :+:    :+:   */
+/*   process_command_braces_quotes.c                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatmtahmdabrahym #+#    #+#             */
-/*   Updated: 2025/01/29 19:31:40 by fatmtahmdabrahym ###   ########.fr       */
+/*   Updated: 2025/09/27 17:06:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+static char	**report_syntax_token(const char *tok, char **envp,
+									t_node *n, char *line)
+{
+	ft_putstr_fd("minishell: syntax error near unexpected token `",
+		STDERR_FILENO);
+	ft_putstr_fd(tok, STDERR_FILENO);
+	ft_putendl_fd("'", STDERR_FILENO);
+	set_exit_status(2);
+	n->syntax_flag = true;
+	free(line);
+	return (envp);
+}
+
+char	**check_braces(char *line, char **envp, t_node *n)
+{
+	int		i;
+
+	i = 0;
+	while (line[i] && ft_strchr(" \t", line[i]))
+		i++;
+	if (line[i] == '{')
+	{
+		ft_putendl_fd("minishell: unexpected end of file", STDERR_FILENO);
+		set_exit_status(2);
+		n->syntax_flag = true;
+		free(line);
+		return (envp);
+	}
+	if (line[i] == '}')
+		return (report_syntax_token("}", envp, n, line));
+	return (NULL);
+}
+
 static int	check_quote_state(char *line, int *quote_state, char *quote_char)
 {
-	int	i;
+	int		i;
 
 	i = 0;
 	while (line[i])
@@ -58,56 +91,4 @@ int	handle_unmatched_quotes(char *line, t_node *n)
 		return (1);
 	}
 	return (0);
-}
-
-char	**run_oror(char *hashed, int idx, char **envp, t_node *n)
-{
-	char		*left;
-	char		*right;
-	size_t		off;
-
-	left = ft_substr(hashed, 0, (size_t)idx);
-	off = (size_t)(idx + 2);
-	right = ft_substr(hashed, (unsigned int)off, ft_strlen(hashed) - off);
-	if (is_blank(left) || is_blank(right))
-	{
-		set_exit_status(2);
-		n->syntax_flag = true;
-		ft_putstr_fd("minishell: syntax error near unexpected token `",
-			STDERR_FILENO);
-		ft_putendl_fd("||'", STDERR_FILENO);
-		free(left);
-		free(right);
-		free(hashed);
-		return (envp);
-	}
-	envp = parser(left, envp, n);
-	if (get_exit_status())
-		envp = parser(right, envp, n);
-	free(hashed);
-	return (envp);
-}
-
-char	**dispatch_line(char *hashed, char **envp, t_node *n)
-{
-	int			idx;
-	int			i;
-
-	i = 0;
-	while (hashed[i] && (hashed[i] == ' ' || hashed[i] == '\t'))
-		i++;
-	if (hashed[i] == ';')
-	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `",
-			STDERR_FILENO);
-		ft_putendl_fd(";'", STDERR_FILENO);
-		set_exit_status(2);
-		n->syntax_flag = true;
-		free(hashed);
-		return (envp);
-	}
-	idx = find_unquoted_oror(hashed, n);
-	if (idx >= 0)
-		return (run_oror(hashed, idx, envp, n));
-	return (subshell(hashed, envp, n));
 }

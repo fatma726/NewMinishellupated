@@ -13,81 +13,123 @@
 #include "minishell.h"
 #include "../../include/bonus.h"
 
-static void	advance_to(char *s, size_t *i, t_node *n, char op)
+void	advance_to(char *s, size_t *i, t_node *n, char op)
 {
-	if (op == '|')
-		while (s[*i]
-			&& (s[*i] != '&' || s[*i + 1] != '&')
-			&& !quote_check(s, (int)*i, n))
-			(*i)++;
-	else
-		while (s[*i]
-			&& (s[*i] != '|' || s[*i + 1] != '|')
-			&& !quote_check(s, (int)*i, n))
-			(*i)++;
+	int	depth;
+
+	depth = 0;
+	while (s[*i])
+	{
+		if (!quote_check(s, (int)*i, n))
+		{
+			if (s[*i] == '(')
+				depth++;
+			else if (s[*i] == ')')
+				depth -= (depth > 0);
+			else if (depth == 0)
+			{
+				if (op == '|' && s[*i] == '&' && s[*i + 1] == '&')
+					break ;
+				if (op == '&' && s[*i] == '|' && s[*i + 1] == '|')
+					break ;
+			}
+		}
+		(*i)++;
+	}
 }
 
-static size_t	find_split_index(char *s, t_node *n)
+int	find_top_level_op(char *s, t_node *n)
 {
-	size_t	i;
+	int	i;
+	int	depth;
 
 	i = 0;
-	while (s[i] && !is_operator_pair(s, i, n))
+	depth = 0;
+	while (s[i])
 	{
-		if (!quote_check(s, (int)i, n) && s[i] == '&' && s[i + 1] != '&')
-			break ;
+		if (!quote_check(s, i, n))
+		{
+			if (s[i] == '(')
+				depth++;
+			else if (s[i] == ')')
+				depth -= (depth > 0);
+			else if (depth == 0 && is_operator_pair(s, (size_t)i, n))
+				return (i);
+			else if (depth == 0 && s[i] == '&' && s[i + 1] != '&')
+				return (i);
+		}
 		i++;
 	}
-	return (i);
+	return (-1);
 }
 
-/* forward declaration for local helper defined below */
-static char	**split_operators_tail(char *s, size_t i, char **envp, t_node *n);
+/* moved is_wrapped_group to helpers3 */
 
-/* define split_operators before it is used to avoid implicit declaration */
-/* prototype declared in minishell.h under BUILD_BONUS */
+static char	**eval_group(char *inner, char **envp, t_node *n)
+{
+	int	pid;
+	int	status;
+
+	pid = fork();
+	if (pid == 0)
+	{
+		parser(inner, strarrdup(envp), n);
+		exit(get_exit_status());
+	}
+	free(inner);
+	waitpid(pid, &status, 0);
+	if (WIFSIGNALED(status))
+		set_exit_status(128 + WTERMSIG(status));
+	else if (WIFEXITED(status))
+		set_exit_status(WEXITSTATUS(status));
+	else
+		set_exit_status(0);
+	return (envp);
+}
+
+/* split_operators_tail moved to helpers3 */
+
+static char	**split_operators_after_index(
+	char *s, int i, char **envp, t_node *n)
+{
+	char	*left;
+
+	if (i < 0)
+	{
+		envp = parser(s, envp, n);
+		return (envp);
+	}
+	if (handle_invalid_start_and_report(s, (size_t)i, n))
+		return (envp);
+	if (has_triple_ops(s, (size_t)i))
+		return (syntax_err_pair(s, (size_t)i, n, 0), envp);
+	if (ft_strchr(s, '>'))
+		if (!check_redirection_syntax(s, n))
+			return (envp);
+	left = ft_substr(s, 0, (size_t)i);
+	envp = parser(left, envp, n);
+	return (split_operators_tail(s, (size_t)i, envp, n));
+}
+
 char	**split_operators(char *s, char **envp, t_node *n)
 {
-	char		*new_str;
-	size_t		i;
+	int		i;
+	size_t	inner_start;
+	size_t	inner_len;
+	char	*inner;
 
 	if (n->syntax_flag)
 		return (envp);
 	if (has_mixed_op_error(s, n))
 		return (envp);
-	i = find_split_index(s, n);
-	if (handle_invalid_start_and_report(s, i, n))
-		return (envp);
-	if (has_triple_ops(s, i))
-		return (syntax_err_pair(s, i, n, 0), envp);
-	if (ft_strchr(s, '>'))
-		if (!check_redirection_syntax(s, n))
-			return (envp);
-	new_str = ft_substr(s, 0, i);
-	envp = parser(new_str, envp, n);
-	return (split_operators_tail(s, i, envp, n));
-}
-
-static char	**split_operators_tail(char *s, size_t i, char **envp, t_node *n)
-{
-	char	*new_str;
-	int		skip;
-
-	if (!s[i])
+	if (is_wrapped_group(s, n, &inner_start, &inner_len))
 	{
+		inner = ft_substr(s, (unsigned int)(inner_start), inner_len);
 		free(s);
-		return (envp);
+		if (!inner)
+			return (envp);
+		return (eval_group(inner, envp, n));
 	}
-	while (!get_exit_status() && s[i] && s[i] == '|' && s[i + 1] == '|')
-		advance_to(s, &i, n, '|');
-	while (get_exit_status() && s[i] && s[i] == '&' && s[i + 1] == '&')
-		advance_to(s, &i, n, '&');
-	if (s[i] == '&' && s[i + 1] != '&')
-		skip = 1;
-	else
-		skip = 2;
-	new_str = ft_substr(s, (unsigned int)(i + (size_t)skip),
-			ft_strlen(s) - (i + (size_t)skip));
-	free(s);
-	return (split_operators(new_str, envp, n));
+	i = find_top_level_op(s, n);
+	return (split_operators_after_index(s, i, envp, n));
 }

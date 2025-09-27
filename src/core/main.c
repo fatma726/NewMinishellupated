@@ -24,7 +24,8 @@ static void	handle_signals(void)
 	}
 	else if (get_signal_number() == SIGPIPE)
 	{
-		ft_putstr_fd(" Broken pipe\n", STDERR_FILENO);
+		if (isatty(STDIN_FILENO))
+			ft_putstr_fd(" Broken pipe\n", STDERR_FILENO);
 		set_exit_status(141);
 		clear_signal_number();
 	}
@@ -48,10 +49,7 @@ static char	**main_loop(char **envp, t_node *n)
 	char	*prompt;
 
 	handle_signals();
-	if (isatty(STDIN_FILENO))
-		prompt = get_and_process_prompt(envp, n);
-	else
-		prompt = ft_strdup("minishell$ ");
+	prompt = get_and_process_prompt(envp, n);
 	line = get_line(prompt);
 	if (prompt)
 		free(prompt);
@@ -59,11 +57,8 @@ static char	**main_loop(char **envp, t_node *n)
 	if (!line)
 		handle_eof_exit(envp, n);
 	envp = process_command(line, envp, n);
-	if (isatty(STDIN_FILENO))
-	{
-		rl_clear_visible_line();
-		rl_reset_line_state();
-	}
+	rl_clear_visible_line();
+	rl_reset_line_state();
 	return (envp);
 }
 
@@ -75,13 +70,11 @@ int	main(int argc, char **argv, char **envp)
 	init_node(&node);
 	set_exit_status(0);
 	envp = strarrdup(envp);
-    envp = shlvl_plus_plus(setpwd(&node, envp));
-    envp = ensure_oldpwd_export(envp);
+	envp = shlvl_plus_plus(setpwd(&node, envp));
+	envp = ensure_oldpwd_export(envp);
 	envp = ft_setenv_envp("_", argv[0], envp);
 	node.path_fallback = NULL;
 	node.line_nbr = 0;
-	if (!ft_getenv("PATH", envp))
-		node.path_fallback = ft_strdup("/usr/bin:/bin");
 	set_signal();
 	while (1)
 		envp = main_loop(envp, &node);

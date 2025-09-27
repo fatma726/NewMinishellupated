@@ -34,7 +34,8 @@ static void	sigpipe_handler(int sig)
 
 void	set_signal(void)
 {
-	set_termios();
+	if (isatty(STDIN_FILENO))
+		set_termios();
 	signal(SIGINT, sigint_handler);
 	signal(SIGQUIT, SIG_IGN);
 	signal(SIGPIPE, sigpipe_handler);

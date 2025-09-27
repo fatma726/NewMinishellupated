@@ -37,7 +37,8 @@ const char	*check_leading_operators(char **args)
 			return ("||");
 	}
 	if (isp(args[0])
-		|| isdp(args[0]) || isda(args[0]) || is_ampersand(args[0]))
+		|| isdp(args[0]) || isda(args[0]) || is_ampersand(args[0])
+		|| is_open_paren(args[0]) || is_close_paren(args[0]))
 		return (args[0]);
 	return (NULL);
 }
@@ -45,10 +46,12 @@ const char	*check_leading_operators(char **args)
 const char	*check_consecutive_ops(char **args, int i)
 {
 	if ((isp(args[i]) || islr(args[i]) || isrr(args[i]) || isdlr(args[i])
-			|| isdp(args[i]) || isda(args[i]) || is_ampersand(args[i]))
+			|| isdp(args[i]) || isda(args[i]) || is_ampersand(args[i])
+			|| is_open_paren(args[i]) || is_close_paren(args[i]))
 		&& (isp(args[i + 1]) || islr(args[i + 1]) || isrr(args[i + 1])
 			|| isdlr(args[i + 1]) || isdp(args[i + 1])
-			|| isda(args[i + 1]) || is_ampersand(args[i + 1])))
+			|| isda(args[i + 1]) || is_ampersand(args[i + 1])
+			|| is_open_paren(args[i + 1]) || is_close_paren(args[i + 1])))
 		return (args[i + 1]);
 	return (NULL);
 }

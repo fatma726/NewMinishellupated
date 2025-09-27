@@ -3,26 +3,42 @@
 /*                                                        :::      ::::::::   */
 /*   exec_error.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
+/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/08/28 20:48:30 by fatima           ###   ########.fr       */
+/*   Updated: 2025/09/27 13:20:06 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	chkdir_check(DIR *check, int err, bool end)
+/*
+ * Normalize error for absolute-path execution attempts.
+ * Deduce a stable errno from stat/access instead of relying on ambient errno,
+ * which could be ENOTTY in non-interactive runs due to unrelated termios calls.
+ */
+static int	derive_abs_path_errno(const char *path, bool end, int *out_err)
 {
-	if (check)
+	struct stat	st;
+
+	if (stat(path, &st) == 0 && S_ISDIR(st.st_mode))
 	{
-		closedir(check);
-		errno = EISDIR;
+		*out_err = EISDIR;
+		return (0);
 	}
-	else if (err == EACCES || errno == ENOTDIR)
-		errno = EACCES;
-	else if (!end)
+	if (access(path, R_OK | X_OK) != 0)
+	{
+		if (errno == EACCES || errno == ENOTDIR)
+			*out_err = EACCES;
+		else if (errno == ENOENT)
+			*out_err = ENOENT;
+		else
+			*out_err = errno;
+		return (0);
+	}
+	if (!end)
 		return (1);
+	*out_err = 0;
 	return (0);
 }
 
@@ -47,33 +63,24 @@ static void	handle_directory_error(char **args, int err, int *status, bool end)
 		ft_putstr_fd(strerror(errno), STDERR_FILENO);
 		ft_putstr_fd("\n", STDERR_FILENO);
 	}
-	*status = 126 + (end && errno != EISDIR && errno != EACCES);
+	*status = 126 + (end && err != EISDIR && err != EACCES);
 }
 
-void	chkdir(char **args, char **envp, bool end)
+void	chkdir(char **args, char **envp, bool end, t_node *node)
 {
-	DIR			*check;
 	int			err;
-	struct stat	stats;
 	int			status;
 
-	err = errno;
-	check = opendir(args[0]);
 	status = 0;
-	stat(args[0], &stats);
-	if (chkdir_check(check, err, end))
+	if (derive_abs_path_errno(args[0], end, &err))
 		return ;
-	if (S_ISDIR(stats.st_mode))
-		errno = EISDIR;
-	err = errno;
-	if (access(args[0], R_OK | X_OK) != 0 || err == EISDIR)
+	if (err == EISDIR || access(args[0], R_OK | X_OK) != 0)
 		handle_directory_error(args, err, &status, end);
-	strarrfree(envp);
-	strarrfree(args);
-	exit(status);
+	set_exit_status(status);
+	cleanup_child_and_exit(args, envp, node);
 }
 
-void	exec_error(char **args, char **envp, char **paths)
+void	exec_error(char **args, char **envp, char **paths, t_node *node)
 {
 	char	bash_line[20];
 	char	*msg;
@@ -95,14 +102,13 @@ void	exec_error(char **args, char **envp, char **paths)
 		ft_putstr_fd(msg, STDERR_FILENO);
 		free(msg);
 	}
-	strarrfree(envp);
 	if (paths)
 		strarrfree(paths);
-	strarrfree(args);
-	exit(127);
+	set_exit_status(127);
+	cleanup_child_and_exit(args, envp, node);
 }
 
-void	checkdot(char **args, char **envp)
+void	checkdot(char **args, char **envp, t_node *node)
 {
 	char	*msg;
 	char	bash_line[20];
@@ -115,9 +121,8 @@ void	checkdot(char **args, char **envp)
 		msg = ft_strdup(": filename argument required\n");
 		ft_putstr_fd(msg, STDERR_FILENO);
 		free(msg);
-		strarrfree(envp);
-		strarrfree(args);
-		exit(2);
+		set_exit_status(2);
+		cleanup_child_and_exit(args, envp, node);
 	}
 	else if (!ft_strncmp(args[0], "..", 3) || !ft_strncmp(args[0], ".", 2))
 	{
@@ -127,7 +132,8 @@ void	checkdot(char **args, char **envp)
 		msg = ft_strdup(": command not found\n");
 		ft_putstr_fd(msg, STDERR_FILENO);
 		free(msg);
-		exit(127);
+		set_exit_status(127);
+		cleanup_child_and_exit(args, envp, node);
 	}
 }
 

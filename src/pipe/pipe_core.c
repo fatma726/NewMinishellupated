@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/26 21:25:07 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/27 18:34:26 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	exec_child(char **args, char **envp, t_node *node)
 	close(node->fds[1]);
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
-	signal(SIGPIPE, SIG_DFL);
+	signal(SIGPIPE, SIG_IGN);
 	if (!node->child_die)
 	{
 		child_args = split_before_pipe_args(args, node);
@@ -97,5 +97,7 @@ void	init_node(t_node *node)
 	node->redir_stop = 0;
 	node->right_flag = 0;
 	node->redir_fd = -1;
-	node->cmd = NULL;
+    node->cmd = NULL;
+    node->heredoc_unterminated = false;
+    node->heredoc_swallowed_input = false;
 }

@@ -21,7 +21,7 @@ char	**strarradd(char **arr, char *str)
 	len = 0;
 	while (arr[len])
 		len++;
-	new = malloc((len + 2) * 8);
+	new = malloc((len + 2) * sizeof(char *));
 	if (!new)
 		return (NULL);
 	i = 0;
@@ -49,7 +49,7 @@ char	**strarrdup(char **strs)
 	i = 0;
 	while (strs[i])
 		i++;
-	newstrs = malloc((i + 1) * 8);
+	newstrs = malloc((i + 1) * sizeof(char *));
 	if (!newstrs)
 		exit(EXIT_FAILURE);
 	i = 0;

@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/26 18:38:00 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/27 18:34:26 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,17 +26,11 @@ static void	sigint_handler(int sig)
 	rl_redisplay();
 }
 
-static void	sigpipe_handler(int sig)
-{
-	(void)sig;
-	set_signal_number(SIGPIPE);
-}
-
 void	set_signal(void)
 {
 	if (isatty(STDIN_FILENO))
 		set_termios();
 	signal(SIGINT, sigint_handler);
 	signal(SIGQUIT, SIG_IGN);
-	signal(SIGPIPE, sigpipe_handler);
+	signal(SIGPIPE, SIG_IGN);
 }

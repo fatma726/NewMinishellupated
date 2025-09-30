@@ -12,6 +12,20 @@
 
 #include "minishell.h"
 
+int	find_unquoted_oror(const char *s, t_node *n)
+{
+	int	i;
+
+	i = 0;
+	while (s[i])
+	{
+		if (!quote_check(s, i, n) && s[i] == '|' && s[i + 1] == '|')
+			return (i);
+		i++;
+	}
+	return (-1);
+}
+
 char	**run_oror(char *hashed, int idx, char **envp, t_node *n)
 {
 	char		*left;

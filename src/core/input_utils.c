@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include <stdio.h>
 
 /* join into result with a newline between chunks */
 
@@ -59,15 +60,19 @@ static int	process_read_line(char **result, char **cur_prompt, char *orig)
 
 static char	*get_continuation_line(char *prompt)
 {
-	char	*result;
-	char	*current_prompt;
-	int		st;
+    char	*result;
+    char	*current_prompt;
+    int		st;
 
-	result = NULL;
-	current_prompt = prompt;
-	while (1)
-	{
-		st = process_read_line(&result, &current_prompt, prompt);
+    /* In non-interactive (piped) mode, continuation prompts are not needed. */
+    if (!isatty(STDIN_FILENO))
+        return (readline(NULL));
+
+    result = NULL;
+    current_prompt = prompt;
+    while (1)
+    {
+        st = process_read_line(&result, &current_prompt, prompt);
 		if (st < 0)
 		{
 			if (current_prompt != prompt)
@@ -88,11 +93,49 @@ static char	*get_continuation_line(char *prompt)
 
 char	*get_line(char *str)
 {
-	char	*line;
-	char	*prompt;
+    char	*line;
+    char	*prompt;
 
-	prompt = ft_strdup(str);
-	line = get_continuation_line(prompt);
-	free(prompt);
-	return (line);
+    if (!isatty(STDIN_FILENO))
+    {
+        /* Fully bypass readline in non-tty mode to avoid control sequences */
+        char    *buf;
+        size_t  cap;
+        ssize_t nread;
+
+        buf = NULL;
+        cap = 0;
+        nread = getline(&buf, &cap, stdin);
+        if (nread < 0)
+        {
+            if (buf)
+                free(buf);
+            return (NULL);
+        }
+        /* detect non-text (binary) bytes in the raw input line */
+        {
+            size_t i;
+            int    nontext = 0;
+            for (i = 0; i < (size_t)nread; i++)
+            {
+                unsigned char c = (unsigned char)buf[i];
+                if (c == '\n')
+                    continue;
+                if ((c < 32 && c != '\t') || c >= 128)
+                {
+                    nontext = 1;
+                    break;
+                }
+            }
+            if (nontext)
+                set_nontext_input(true);
+        }
+        if (nread > 0 && buf[nread - 1] == '\n')
+            buf[nread - 1] = '\0';
+        return (buf);
+    }
+    prompt = ft_strdup(str);
+    line = get_continuation_line(prompt);
+    free(prompt);
+    return (line);
 }

@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/08/27 20:36:24 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/30 15:15:29 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,9 @@ int	left_double_redir(char **args, char **envp, int *i, t_node *node)
 		cleanup_heredoc_file(node);
 		move_redir_args(args, node->ori_args, i);
 		*i -= 1;
-		return (unlink(".temp") == -1);
+		unlink(".temp");
+		set_exit_status(0);
+		return (0);
 	}
 	return (0);
 }

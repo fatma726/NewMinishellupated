@@ -69,12 +69,18 @@ static char	**process_quotes_and_exec(char **args, char **envp, t_node *node)
 
 char	**parser(char *str, char **envp, t_node *node)
 {
-	char	**args;
+    char	**args;
 
-	args = process_parser_input(str, envp, node);
-	if (handle_parser_errors(args, envp, node))
-	{
-		return (envp);
-	}
+    if (!isatty(STDIN_FILENO) && get_nontext_input())
+    {
+        clear_nontext_input();
+        set_exit_status(127);
+        return (envp);
+    }
+    args = process_parser_input(str, envp, node);
+    if (handle_parser_errors(args, envp, node))
+    {
+        return (envp);
+    }
 	return (process_quotes_and_exec(args, envp, node));
 }

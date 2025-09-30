@@ -17,10 +17,12 @@
 
 static struct s_global_slots	*slots(void)
 {
-	static struct s_global_slots	state = {0, 0};
+    static struct s_global_slots	state = {0, 0};
 
-	return (&state);
+    return (&state);
 }
+
+static int	g_nontext_input = 0;
 
 int	get_signal_number(void)
 {
@@ -40,7 +42,22 @@ void	set_signal_number(int sig)
 /* internal helper to get/set exit status without adding globals elsewhere */
 int	_ms_exit_status(int op, int value)
 {
-	if (op)
-		slots()->exit_status = value;
-	return (slots()->exit_status);
+    if (op)
+        slots()->exit_status = value;
+    return (slots()->exit_status);
+}
+
+bool	get_nontext_input(void)
+{
+    return (g_nontext_input != 0);
+}
+
+void	set_nontext_input(bool v)
+{
+    g_nontext_input = (v != 0);
+}
+
+void	clear_nontext_input(void)
+{
+    g_nontext_input = 0;
 }

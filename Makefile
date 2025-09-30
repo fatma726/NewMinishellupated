@@ -54,7 +54,7 @@ LIBFT_OBJS := $(addprefix $(LIBFT_DIR)/, $(LIBFT_SRCS:.c=.o))
 LIBFT     := $(LIBFT_DIR)/libft.a
 
 # Source files (consolidated structure)
-MAIN = env_utils env_utils2 env_helpers env_helpers2 global status input_utils input_helpers main process_command process_command_standalone process_command_braces_quotes process_command_run_oror process_command_dispatch core_utils strarrutils stubs signals memory_validation
+MAIN = env_utils env_utils2 env_helpers env_helpers2 global status input_utils input_helpers main process_command process_command_standalone process_command_braces_quotes process_command_run_oror process_command_dispatch core_utils strarrutils stubs signals memory_validation semicolon_utils semicolon_processing semicolon_splitting semicolon_final
 CMD = cd cd_utils basic_commands cmd_utils env exec exec_error exec_utils exec_utils2 exit exit_utils exit_utils2 export export_utils export_helpers unset unset_utils
 PARSER =  escape_split expand_envvar expand_envvar_helpers parser_utils operator_utils operator_utils2 operator_helpers operator_checks parser parser_helpers parser_wildcard_phase prompt_helpers rm_quotes rm_quotes_utils syntax_utils syntax_helpers syntax_helpers_utils syntax syntax_helpers3 syntax_helpers4 add_spaces_ampersand add_spaces_redirections add_spaces_redirections_helpers
 REDIR = argu_cleanup cmd_redir exec_redir heredoc_utils redir_utils utils_redir utils_redir2 utils_redir3 utils_redir4

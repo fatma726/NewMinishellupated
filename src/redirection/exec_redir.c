@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/23 16:29:03 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/30 15:18:03 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,8 @@ static int	handle_standalone_heredoc(char **args, char **envp, t_node *node)
 		&& !ret)
 		if (isdlr(node->ori_args[i]))
 			ret = left_double_redir(args, envp, &i, node);
+	if (!ret)
+		set_exit_status(0);
 	return (ret);
 }
 

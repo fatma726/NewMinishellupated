@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/21 16:39:06 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/30 14:03:36 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,11 @@ void	handle_exit_message(void)
 {
 	char	exit_msg[5];
 
-	ft_strlcpy(exit_msg, "exit", 5);
-	ft_putendl_fd(exit_msg, STDOUT_FILENO);
+	if (isatty(STDIN_FILENO))
+	{
+		ft_strlcpy(exit_msg, "exit", 5);
+		ft_putendl_fd(exit_msg, STDOUT_FILENO);
+	}
 }
 
 void	handle_numeric_error(char *arg)

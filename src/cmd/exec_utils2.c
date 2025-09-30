@@ -14,10 +14,13 @@
 
 bool	is_builtin_command(char **args)
 {
-	if (!access(args[0], X_OK) || !ft_strncmp(args[0], "cd", 3)
-		|| !ft_strncmp(args[0], "echo", 5) || !ft_strncmp(args[0], "env", 4)
-		|| !ft_strncmp(args[0], "exit", 5) || !ft_strncmp(args[0], "export", 7)
-		|| !ft_strncmp(args[0], "pwd", 4) || !ft_strncmp(args[0], "unset", 6))
-		return (true);
-	return (false);
+	if (!args || !args[0])
+		return (false);
+	return (!ft_strncmp(args[0], "cd", 3)
+		|| !ft_strncmp(args[0], "echo", 5)
+		|| !ft_strncmp(args[0], "env", 4)
+		|| !ft_strncmp(args[0], "exit", 5)
+		|| !ft_strncmp(args[0], "export", 7)
+		|| !ft_strncmp(args[0], "pwd", 4)
+		|| !ft_strncmp(args[0], "unset", 6));
 }

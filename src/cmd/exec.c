@@ -66,8 +66,6 @@ static void	handle_signaled_status(int status)
 		ft_putstr_fd("Quit: 3\n", STDOUT_FILENO);
 	else if (sig == SIGPIPE)
 	{
-		if (isatty(STDIN_FILENO))
-			ft_putstr_fd(" Broken pipe\n", STDERR_FILENO);
 	}
 	set_exit_status(128 + sig);
 }

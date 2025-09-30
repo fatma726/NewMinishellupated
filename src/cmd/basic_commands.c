@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/20 13:30:00 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/30 14:38:47 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,13 @@ static int	is_n_option(char *str)
 
 	if (ft_strncmp(str, "-n", 2))
 		return (0);
-	i = 1;
-	while (str && str[++i])
+	i = 2;
+	while (str && str[i])
+	{
 		if (str[i] != 'n')
 			return (0);
+		i++;
+	}
 	return (1);
 }
 

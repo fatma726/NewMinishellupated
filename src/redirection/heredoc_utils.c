@@ -34,27 +34,38 @@ static void	write_heredoc_line(bool expand_vars, char *line,
 
 static char	*get_heredoc_line(void)
 {
-	return (readline("> "));
+	if (isatty(STDIN_FILENO))
+		return (readline("> "));
+	return (readline(NULL));
 }
 
+/* returns 0 if delimiter matched, 1 if EOF reached before delimiter */
 static int	process_heredoc_input(char *delimiter, bool expand_vars,
 		char **envp, t_node *node)
 {
 	char	*line;
+    int 	ended_by_eof;
+    int     lines_read;
 
-	while (1)
-	{
-		line = get_heredoc_line();
-		if (!line)
-			break ;
-		if (ft_strncmp(line, delimiter, ft_strlen(delimiter) + 1) == 0)
-		{
-			free(line);
-			break ;
-		}
-		write_heredoc_line(expand_vars, line, envp, node);
-	}
-	return (0);
+    ended_by_eof = 1;
+    lines_read = 0;
+    while (1)
+    {
+        line = get_heredoc_line();
+        if (!line)
+            break ;
+        if (ft_strncmp(line, delimiter, ft_strlen(delimiter) + 1) == 0)
+        {
+            free(line);
+            ended_by_eof = 0;
+            break ;
+        }
+        lines_read++;
+        write_heredoc_line(expand_vars, line, envp, node);
+    }
+    if (ended_by_eof && lines_read > 0)
+        node->heredoc_swallowed_input = true;
+    return (ended_by_eof);
 }
 
 int	heredoc_loop(char **args, char **envp, int *i, t_node *node)
@@ -62,6 +73,7 @@ int	heredoc_loop(char **args, char **envp, int *i, t_node *node)
 	char	*delimiter;
 	char	*clean_delimiter;
 	bool	expand_vars;
+    int     unterminated;
 
 	delimiter = args[*i + 1];
 	if (delimiter && delimiter[0] == (char)31)
@@ -70,6 +82,8 @@ int	heredoc_loop(char **args, char **envp, int *i, t_node *node)
 		clean_delimiter = delimiter;
 	expand_vars = (!ft_strchr(clean_delimiter, '"')
 			&& !ft_strchr(clean_delimiter, '\''));
-	process_heredoc_input(clean_delimiter, expand_vars, envp, node);
+	unterminated = process_heredoc_input(clean_delimiter, expand_vars, envp, node);
+    if (unterminated)
+        node->heredoc_unterminated = true;
 	return (0);
 }

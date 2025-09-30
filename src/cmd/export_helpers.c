@@ -28,7 +28,7 @@ void	print_escaped_value(char *value)
 
 bool	is_valid_identifier_start(char c)
 {
-	return (c && c != '=' && !ft_isdigit(c));
+	return (ft_isalpha((unsigned char)c) || c == '_');
 }
 
 bool	is_valid_identifier_char(char c)

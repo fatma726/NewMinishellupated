@@ -35,7 +35,7 @@ int	find_envkey(char *str, char *envp)
 	i = 0;
 	while (str[i] && envp[i] && str[i] == envp[i] && envp[i] != '=')
 		i++;
-	return (str[i] == '\0' && envp[i] == '=');
+	return (str[i] == '\0' && (envp[i] == '=' || envp[i] == '\0'));
 }
 
 static void	clear_path_fallback_if(char *str, t_node *node)

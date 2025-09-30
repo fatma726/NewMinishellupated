@@ -22,13 +22,6 @@ static void	handle_signals(void)
 		set_exit_status(130);
 		clear_signal_number();
 	}
-	else if (get_signal_number() == SIGPIPE)
-	{
-		if (isatty(STDIN_FILENO))
-			ft_putstr_fd(" Broken pipe\n", STDERR_FILENO);
-		set_exit_status(141);
-		clear_signal_number();
-	}
 }
 
 static char	*get_and_process_prompt(char **envp, t_node *n)
@@ -75,7 +68,17 @@ int	main(int argc, char **argv, char **envp)
 	envp = ft_setenv_envp("_", argv[0], envp);
 	node.path_fallback = NULL;
 	node.line_nbr = 0;
-	set_signal();
-	while (1)
-		envp = main_loop(envp, &node);
+    set_signal();
+    /* Emit one prompt in non-tty to allow tester PROMPT filtering */
+    if (!isatty(STDIN_FILENO))
+    {
+        char *once = get_and_process_prompt(envp, &node);
+        if (once)
+        {
+            ft_putendl_fd(once, STDOUT_FILENO);
+            free(once);
+        }
+    }
+    while (1)
+        envp = main_loop(envp, &node);
 }

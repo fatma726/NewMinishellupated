@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/09/27 13:20:06 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/27 18:34:26 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ void	exec_error(char **args, char **envp, char **paths, t_node *node)
 
 	ft_strlcpy(bash_line, "minishell: ", 20);
 	ft_putstr_fd(bash_line, STDERR_FILENO);
-	if (ft_strchr(args[0], '/') || !paths || !paths[0])
+	if (ft_strchr(args[0], '/'))
 	{
 		errno = ENOENT;
 		ft_putstr_fd(args[0], STDERR_FILENO);

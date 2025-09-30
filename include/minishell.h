@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/27 12:18:52 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/30 14:52:58 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,10 @@ typedef struct s_node
 	int		redir_stop;
 	int		right_flag;
 	bool	syntax_flag;
+    /* flag: last heredoc ended due to EOF before delimiter */
+    bool    heredoc_unterminated;
+    /* flag: last heredoc consumed at least one line of input */
+    bool    heredoc_swallowed_input;
 }	t_node;
 
 typedef struct s_prompt_data
@@ -119,6 +123,26 @@ int				get_exit_status(void);
 void			set_exit_status(int status);
 /* internal single-slot exit-status accessor (implemented in global.c) */
 int				_ms_exit_status(int op, int value);
+/* non-interactive input marker (binary/non-text line seen) */
+bool			get_nontext_input(void);
+void			set_nontext_input(bool v);
+void			clear_nontext_input(void);
+
+/* semicolon handling functions */
+typedef struct s_split_data
+{
+	size_t	cmd_idx;
+	size_t	start;
+}	t_split_data;
+
+char			**split_by_semicolons(char *line, t_node *n);
+char			**process_semicolon_commands(char *line, char **envp,
+					t_node *n);
+bool			has_semicolon(char *line, t_node *n);
+void			trim_whitespace(char *str);
+size_t			count_semicolons(char *line, t_node *n);
+char			**process_semicolon_split(char *line, t_node *n,
+					char **commands);
 
 /* bonus hooks */
 # ifdef BUILD_BONUS

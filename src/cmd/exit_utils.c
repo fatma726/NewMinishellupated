@@ -29,7 +29,7 @@ void	cleanup_child_and_exit(char **args, char **envp, t_node *node)
 		strarrfree(args);
 	if (envp)
 		strarrfree(envp);
-	exit(get_exit_status());
+    exit(get_exit_status());
 }
 
 void	cleanup_and_exit(char **args, char **envp, t_node *node)
@@ -46,5 +46,5 @@ void	cleanup_and_exit(char **args, char **envp, t_node *node)
 	strarrfree(envp);
 	clear_history();
 	restore_termios();
-	exit(get_exit_status());
+    exit(get_exit_status());
 }

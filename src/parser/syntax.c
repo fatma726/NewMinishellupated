@@ -14,17 +14,29 @@
 
 bool	syntax_check(char **args, char **envp, t_node *node)
 {
-	(void)envp;
-	(void)node;
-	if (!args || !args[0])
-		return (true);
-	if (!check_leading_operators_syntax(args))
-		return (false);
-	if (!check_consecutive_operators_syntax(args))
-		return (false);
-	if (!check_trailing_operators_syntax(args))
-		return (false);
-	return (true);
+    (void)envp;
+    (void)node;
+    if (!args || !args[0])
+        return (true);
+    /* Disallow mixed pipe/ampersand operator combos like "|&" or "&|" */
+    {
+        int i;
+        i = 0;
+        while (args[i])
+        {
+            if (ft_strnstr(args[i], "|&", ft_strlen(args[i]))
+                || ft_strnstr(args[i], "&|", ft_strlen(args[i])))
+                return (false);
+            i++;
+        }
+    }
+    if (!check_leading_operators_syntax(args))
+        return (false);
+    if (!check_consecutive_operators_syntax(args))
+        return (false);
+    if (!check_trailing_operators_syntax(args))
+        return (false);
+    return (true);
 }
 
 void	handle_syntax_error(char **envp, t_node *node)

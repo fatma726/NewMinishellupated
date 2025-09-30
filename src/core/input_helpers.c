@@ -27,25 +27,7 @@ void	handle_eof_exit(char **envp, t_node *node)
 		strarrfree(envp);
 	clear_history();
 	restore_termios();
-    /*
-    ** Special-cases for harnesses that pipe scripted input:
-    ** - If EOF occurs before the first command line is ever read
-    **   (node->line_nbr == 1), print the exit status so they can capture it.
-    ** - If the previous heredoc consumed the rest of stdin (unterminated
-    **   before its delimiter), also print the exit status here because the
-    **   harness' subsequent `echo $?` will have been eaten by our heredoc.
-    */
-    if (node && (node->line_nbr == 1 || (node->heredoc_unterminated && node->heredoc_swallowed_input)))
-    {
-        /* ensure exit code is not glued to a visible prompt */
-        ft_putchar_fd('\n', STDOUT_FILENO);
-        char *code = ft_itoa(get_exit_status());
-        if (code)
-        {
-            ft_putendl_fd(code, STDOUT_FILENO);
-            free(code);
-        }
-    }
+    (void)node;
     exit(get_exit_status());
 }
 

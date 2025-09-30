@@ -34,9 +34,25 @@ static void	write_heredoc_line(bool expand_vars, char *line,
 
 static char	*get_heredoc_line(void)
 {
-	if (isatty(STDIN_FILENO))
-		return (readline("> "));
-	return (readline(NULL));
+    if (isatty(STDIN_FILENO))
+        return (readline("> "));
+    /* Non-tty: avoid readline to prevent escape sequences; use getline */
+    {
+        char   *buf = NULL;
+        size_t  cap = 0;
+        ssize_t nread;
+
+        nread = getline(&buf, &cap, stdin);
+        if (nread < 0)
+        {
+            if (buf)
+                free(buf);
+            return (NULL);
+        }
+        if (nread > 0 && buf[nread - 1] == '\n')
+            buf[nread - 1] = '\0';
+        return (buf);
+    }
 }
 
 /* returns 0 if delimiter matched, 1 if EOF reached before delimiter */
@@ -82,8 +98,10 @@ int	heredoc_loop(char **args, char **envp, int *i, t_node *node)
 		clean_delimiter = delimiter;
 	expand_vars = (!ft_strchr(clean_delimiter, '"')
 			&& !ft_strchr(clean_delimiter, '\''));
-	unterminated = process_heredoc_input(clean_delimiter, expand_vars, envp, node);
+    unterminated = process_heredoc_input(clean_delimiter, expand_vars, envp, node);
     if (unterminated)
+    {
         node->heredoc_unterminated = true;
-	return (0);
+    }
+    return (0);
 }

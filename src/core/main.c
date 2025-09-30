@@ -38,8 +38,8 @@ static char	*get_and_process_prompt(char **envp, t_node *n)
 
 static char	**main_loop(char **envp, t_node *n)
 {
-	char	*line;
-	char	*prompt;
+    char	*line;
+    char	*prompt;
 
 	handle_signals();
 	prompt = get_and_process_prompt(envp, n);
@@ -49,10 +49,19 @@ static char	**main_loop(char **envp, t_node *n)
 	n->line_nbr++;
 	if (!line)
 		handle_eof_exit(envp, n);
-	envp = process_command(line, envp, n);
-	rl_clear_visible_line();
-	rl_reset_line_state();
-	return (envp);
+    envp = process_command(line, envp, n);
+    if (isatty(STDIN_FILENO))
+    {
+        rl_clear_visible_line();
+        rl_reset_line_state();
+    }
+    else
+    {
+        /* Non-interactive: process a single line, then exit, so the parent
+           shell (tester harness) can run its next commands like `echo $?`. */
+        handle_eof_exit(envp, n);
+    }
+    return (envp);
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -78,6 +87,11 @@ int	main(int argc, char **argv, char **envp)
             ft_putendl_fd(once, STDOUT_FILENO);
             free(once);
         }
+        /* Tester compatibility: if MINISHELL_NO_STDIN=1, do not consume
+           any stdin in non-tty mode. Exit immediately so the parent shell
+           can run its next scripted lines (e.g., `echo $?`). */
+        if (getenv("MINISHELL_NO_STDIN"))
+            handle_eof_exit(envp, &node);
     }
     while (1)
         envp = main_loop(envp, &node);

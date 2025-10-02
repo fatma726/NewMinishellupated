@@ -5,11 +5,10 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/09/06 19:17:00 by fatmtahmdab      ###   ########.fr       */
+/*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
+/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "../../../include/bonus.h"
 
 void	cleanup_and_return(char **newargs, int j, char **args)

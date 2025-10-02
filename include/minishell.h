@@ -5,11 +5,10 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/30 14:52:58 by fatmtahmdab      ###   ########.fr       */
+/*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
+/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -100,10 +99,10 @@ typedef struct s_node
 	int		redir_stop;
 	int		right_flag;
 	bool	syntax_flag;
-    /* flag: last heredoc ended due to EOF before delimiter */
-    bool    heredoc_unterminated;
-    /* flag: last heredoc consumed at least one line of input */
-    bool    heredoc_swallowed_input;
+	/* flag: last heredoc ended due to EOF before delimiter */
+	bool	heredoc_unterminated;
+	/* flag: last heredoc consumed at least one line of input */
+	bool	heredoc_swallowed_input;
 }	t_node;
 
 typedef struct s_prompt_data
@@ -189,6 +188,7 @@ void			handle_exit_message(void);
 void			handle_numeric_error(char *arg);
 void			handle_too_many_args(void);
 bool			handle_exit_with_args(char **args);
+bool			exit_will_terminate(char **args);
 void			cleanup_child_and_exit(char **args, char **envp, t_node *node);
 void			cleanup_and_exit(char **args, char **envp, t_node *node);
 void			handle_eof_exit(char **envp, t_node *node);
@@ -248,6 +248,10 @@ char			**ensure_oldpwd_export(char **envp);
 /* main */
 // Removed internationalization - not required for evaluation
 char			*get_line(char *str);
+char			*read_line_non_tty(void);
+int				append_line(char **result, char *line);
+char			*get_continuation_line(char *prompt);
+int				process_read_line(char **result, char **cur_prompt, char *orig);
 char			**get_file(int fd);
 /* Non-interactive input helpers removed */
 // Removed internationalization - not required for evaluation

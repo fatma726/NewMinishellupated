@@ -6,11 +6,11 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/27 16:53:56 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "minishell.h"
+
 #include <termios.h>
 
 bool	is_blank(const char *s)

@@ -6,11 +6,10 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/24 12:00:49 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/10/01 23:56:56 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
 #include "../../include/bonus.h"
 
 void	advance_to(char *s, size_t *i, t_node *n, char op)
@@ -67,13 +66,16 @@ int	find_top_level_op(char *s, t_node *n)
 
 static char	**eval_group(char *inner, char **envp, t_node *n)
 {
-	int	pid;
-	int	status;
+	int		pid;
+	int		status;
+	char	**envp_copy;
 
 	pid = fork();
 	if (pid == 0)
 	{
-		parser(inner, strarrdup(envp), n);
+		envp_copy = strarrdup(envp);
+		parser(inner, envp_copy, n);
+		strarrfree(envp_copy);
 		exit(get_exit_status());
 	}
 	free(inner);
@@ -119,7 +121,10 @@ char	**split_operators(char *s, char **envp, t_node *n)
 	char	*inner;
 
 	if (n->syntax_flag)
+	{
+		free(s);
 		return (envp);
+	}
 	if (has_mixed_op_error(s, n))
 		return (envp);
 	if (is_wrapped_group(s, n, &inner_start, &inner_len))

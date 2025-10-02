@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   parser_wildcard_phase.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
+/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/22 22:22:01 by fatima           ###   ########.fr       */
+/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "minishell.h"
+
 #ifdef BUILD_BONUS
 # include "../../bonus/include/bonus.h"
 

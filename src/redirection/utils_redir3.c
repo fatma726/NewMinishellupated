@@ -5,11 +5,10 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/24 11:33:04 by fatmtahmdab      ###   ########.fr       */
+/*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
+/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "minishell.h"
 
 void	exec_redir_child(char **args, char **envp, t_node *node, int *flag)

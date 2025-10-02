@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fatima <fatima@student.42.fr>              +#+  +:+       +#+        */
+/*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/09/22 22:22:01 by fatima           ###   ########.fr       */
+/*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
+/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "minishell.h"
+
 #ifdef BUILD_BONUS
 # include "../../bonus/include/bonus.h"
 #endif
@@ -69,18 +69,16 @@ static char	**process_quotes_and_exec(char **args, char **envp, t_node *node)
 
 char	**parser(char *str, char **envp, t_node *node)
 {
-    char	**args;
+	char	**args;
 
-    if (!isatty(STDIN_FILENO) && get_nontext_input())
-    {
-        clear_nontext_input();
-        set_exit_status(127);
-        return (envp);
-    }
-    args = process_parser_input(str, envp, node);
-    if (handle_parser_errors(args, envp, node))
-    {
-        return (envp);
-    }
+	if (!isatty(STDIN_FILENO) && get_nontext_input())
+	{
+		clear_nontext_input();
+		set_exit_status(127);
+		return (envp);
+	}
+	args = process_parser_input(str, envp, node);
+	if (handle_parser_errors(args, envp, node))
+		return (envp);
 	return (process_quotes_and_exec(args, envp, node));
 }

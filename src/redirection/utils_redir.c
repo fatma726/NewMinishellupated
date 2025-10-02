@@ -5,24 +5,11 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/08/30 18:40:20 by fatmtahmdab      ###   ########.fr       */
+/*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
+/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "minishell.h"
-
-int	redir_chk(char **args)
-{
-	int	i;
-
-	i = -1;
-	while (args[++i])
-		if (isdlr(args[i]) || isdrr(args[i]) || islr(args[i]) || islrr(args[i])
-			|| isrr(args[i]) || istlr(args[i]))
-			return (1);
-	return (0);
-}
 
 static bool	check_pipe_pattern(char **args, int i)
 {

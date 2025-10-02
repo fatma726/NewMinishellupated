@@ -5,20 +5,11 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 1970/01/01 00:00:00 by fatmtahmdabrahym #+#    #+#             */
-/*   Updated: 2025/01/29 19:31:40 by fatmtahmdabrahym ###   ########.fr       */
+/*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
+/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "minishell.h"
-
-int	ft_setenv_var(const char *name, const char *value, int overwrite)
-{
-	(void)name;
-	(void)value;
-	(void)overwrite;
-	return (0);
-}
 
 static char	*build_env_pair_for_envp(const char *name, const char *value)
 {
@@ -69,4 +60,26 @@ char	**ft_setenv_envp(const char *name, const char *value, char **envp)
 	return (envp);
 }
 
-/* moved to env_helpers2.c to satisfy function-count norm */
+static bool	env_has_key_any(char **envp, const char *name)
+{
+	int			i;
+	size_t		len;
+
+	len = ft_strlen(name);
+	i = 0;
+	while (envp[i])
+	{
+		if (!ft_strncmp(envp[i], name, len)
+			&& (envp[i][len] == '=' || envp[i][len] == '\0'))
+			return (true);
+		i++;
+	}
+	return (false);
+}
+
+char	**ensure_oldpwd_export(char **envp)
+{
+	if (!env_has_key_any(envp, "OLDPWD"))
+		envp = ft_setenv_envp("OLDPWD", NULL, envp);
+	return (envp);
+}

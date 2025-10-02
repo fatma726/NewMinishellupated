@@ -5,11 +5,10 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 1970/01/01 00:00:00 by lcouturi          #+#    #+#             */
-/*   Updated: 2025/08/28 19:16:51 by fatmtahmdab      ###   ########.fr       */
+/*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
+/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "../include/minishell.h"
 
 static char	*lowest(t_list *lst)
@@ -55,14 +54,16 @@ static t_list	*load_lst_loop(struct dirent *dr, DIR *dir, bool hidden)
 static char	**load_files(t_list *lst)
 {
 	char	**files;
+	t_list	*next;
 
 	files = malloc(sizeof(char *) * ((size_t)ft_lstsize(lst) + 1));
 	if (!files)
 	{
 		while (lst)
 		{
+			next = lst->next;
 			free(lst);
-			lst = lst->next;
+			lst = next;
 		}
 		exit(EXIT_FAILURE);
 	}

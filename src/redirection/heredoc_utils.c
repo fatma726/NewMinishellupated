@@ -5,11 +5,10 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 1970/01/01 00:00:00 by kyung-ki          #+#    #+#             */
-/*   Updated: 2025/09/24 11:12:06 by fatmtahmdab      ###   ########.fr       */
+/*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
+/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "minishell.h"
 
 static void	write_heredoc_line(bool expand_vars, char *line,
@@ -34,54 +33,52 @@ static void	write_heredoc_line(bool expand_vars, char *line,
 
 static char	*get_heredoc_line(void)
 {
-    if (isatty(STDIN_FILENO))
-        return (readline("> "));
-    /* Non-tty: avoid readline to prevent escape sequences; use getline */
-    {
-        char   *buf = NULL;
-        size_t  cap = 0;
-        ssize_t nread;
+	char		*buf;
+	size_t		cap;
+	ssize_t		nread;
 
-        nread = getline(&buf, &cap, stdin);
-        if (nread < 0)
-        {
-            if (buf)
-                free(buf);
-            return (NULL);
-        }
-        if (nread > 0 && buf[nread - 1] == '\n')
-            buf[nread - 1] = '\0';
-        return (buf);
-    }
+	if (isatty(STDIN_FILENO))
+		return (readline("> "));
+	buf = NULL;
+	cap = 0;
+	nread = getline(&buf, &cap, stdin);
+	if (nread < 0)
+	{
+		if (buf)
+			free(buf);
+		return (NULL);
+	}
+	if (nread > 0 && buf[nread - 1] == '\n')
+		buf[nread - 1] = '\0';
+	return (buf);
 }
 
-/* returns 0 if delimiter matched, 1 if EOF reached before delimiter */
 static int	process_heredoc_input(char *delimiter, bool expand_vars,
 		char **envp, t_node *node)
 {
 	char	*line;
-    int 	ended_by_eof;
-    int     lines_read;
+	int		ended_by_eof;
+	int		lines_read;
 
-    ended_by_eof = 1;
-    lines_read = 0;
-    while (1)
-    {
-        line = get_heredoc_line();
-        if (!line)
-            break ;
-        if (ft_strncmp(line, delimiter, ft_strlen(delimiter) + 1) == 0)
-        {
-            free(line);
-            ended_by_eof = 0;
-            break ;
-        }
-        lines_read++;
-        write_heredoc_line(expand_vars, line, envp, node);
-    }
-    if (ended_by_eof && lines_read > 0)
-        node->heredoc_swallowed_input = true;
-    return (ended_by_eof);
+	ended_by_eof = 1;
+	lines_read = 0;
+	while (1)
+	{
+		line = get_heredoc_line();
+		if (!line)
+			break ;
+		if (ft_strncmp(line, delimiter, ft_strlen(delimiter) + 1) == 0)
+		{
+			free(line);
+			ended_by_eof = 0;
+			break ;
+		}
+		lines_read++;
+		write_heredoc_line(expand_vars, line, envp, node);
+	}
+	if (ended_by_eof && lines_read > 0)
+		node->heredoc_swallowed_input = true;
+	return (ended_by_eof);
 }
 
 int	heredoc_loop(char **args, char **envp, int *i, t_node *node)
@@ -89,7 +86,7 @@ int	heredoc_loop(char **args, char **envp, int *i, t_node *node)
 	char	*delimiter;
 	char	*clean_delimiter;
 	bool	expand_vars;
-    int     unterminated;
+	int		unterminated;
 
 	delimiter = args[*i + 1];
 	if (delimiter && delimiter[0] == (char)31)
@@ -98,10 +95,9 @@ int	heredoc_loop(char **args, char **envp, int *i, t_node *node)
 		clean_delimiter = delimiter;
 	expand_vars = (!ft_strchr(clean_delimiter, '"')
 			&& !ft_strchr(clean_delimiter, '\''));
-    unterminated = process_heredoc_input(clean_delimiter, expand_vars, envp, node);
-    if (unterminated)
-    {
-        node->heredoc_unterminated = true;
-    }
-    return (0);
+	unterminated = process_heredoc_input(clean_delimiter,
+			expand_vars, envp, node);
+	if (unterminated)
+		node->heredoc_unterminated = true;
+	return (0);
 }

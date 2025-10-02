@@ -6,10 +6,9 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/27 18:34:26 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "minishell.h"
 
 void	backup_restor(t_node *node)
@@ -83,15 +82,14 @@ char	**repeat(char **args, char **envp, t_node *node)
 
 char	**execute(char **args, char **envp, t_node *node)
 {
-    /* Avoid opening backup FDs for immediate-exit builtin */
-    if (args && args[0] && !ft_strncmp(args[0], "exit", 5))
-    {
-        cmd_exit(args, envp, node);
-        /* cmd_exit may not return */
-    }
-    node->backup_stdout = dup(STDOUT_FILENO);
-    node->backup_stdin = dup(STDIN_FILENO);
-    envp = repeat(args, envp, node);
-    backup_restor(node);
-    return (cloturn(node->backup_stdout, node->backup_stdin, envp));
+	if (args && args[0] && !ft_strncmp(args[0], "exit", 5))
+	{
+		if (exit_will_terminate(args))
+			cmd_exit(args, envp, node);
+	}
+	node->backup_stdout = dup(STDOUT_FILENO);
+	node->backup_stdin = dup(STDIN_FILENO);
+	envp = repeat(args, envp, node);
+	backup_restor(node);
+	return (cloturn(node->backup_stdout, node->backup_stdin, envp));
 }

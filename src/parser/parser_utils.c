@@ -6,31 +6,51 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/20 13:30:00 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/30 23:46:10 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "minishell.h"
 
-/* From prompt6.c */
 char	*expand_prompt(char *fmt, char **envp, t_node *node)
 {
 	int		l;
 	char	*new_fmt;
 	char	*pwd;
+	char	*pwd_orig;
 
+	if (ft_getenv("PWD", envp))
+		pwd_orig = ft_getenv("PWD", envp);
+	else
+		pwd_orig = node->pwd;
 	pwd = get_pwd_for_prompt(envp, node);
 	l = promptlen(fmt, envp, pwd, -1);
 	if (!l)
 	{
 		free(fmt);
+		if (pwd != pwd_orig)
+			free(pwd);
 		return (NULL);
 	}
 	new_fmt = expand_loop(fmt - 1, malloc((size_t)(l + 1)),
 			ft_getenv("USER", envp), pwd);
 	new_fmt[l] = '\0';
 	free(fmt);
+	if (pwd != pwd_orig)
+		free(pwd);
 	return (new_fmt);
+}
+
+char	**find_command(char **args, char **envp, t_node *node)
+{
+	int	i;
+
+	if (!args || !args[0])
+		return (envp);
+	i = 0;
+	while (args[i] && args[i + 1] && !isp(node->ori_args[i + 1]))
+		i++;
+	envp = ft_setenv_envp("_", args[i], envp);
+	return (dispatch_builtin(args, envp, node));
 }
 
 /* From parser_helpers2.c */

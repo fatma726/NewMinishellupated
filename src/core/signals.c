@@ -6,11 +6,11 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/27 18:34:26 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "minishell.h"
+
 #include <signal.h>
 #include <termios.h>
 #include <readline/readline.h>
@@ -33,4 +33,14 @@ void	set_signal(void)
 	signal(SIGINT, sigint_handler);
 	signal(SIGQUIT, SIG_IGN);
 	signal(SIGPIPE, SIG_IGN);
+}
+
+int	get_exit_status(void)
+{
+	return (_ms_exit_status(0, 0));
+}
+
+void	set_exit_status(int status)
+{
+	(void)_ms_exit_status(1, status);
 }

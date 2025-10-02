@@ -5,30 +5,56 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 1970/01/01 00:00:00 by fatmtahmdabrahym #+#    #+#             */
-/*   Updated: 2025/01/29 19:31:40 by fatmtahmdabrahym ###   ########.fr       */
+/*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
+/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "minishell.h"
-#include <readline/readline.h>
-#include <readline/history.h>
 
-void	handle_eof_exit(char **envp, t_node *node)
+#include <readline/readline.h>
+
+char	*get_continuation_line(char *prompt)
 {
-	if (node)
+	char	*result;
+	char	*current_prompt;
+	int		st;
+
+	if (!isatty(STDIN_FILENO))
+		return (readline(NULL));
+	result = NULL;
+	current_prompt = prompt;
+	while (1)
 	{
-		if (node->pwd)
-			free(node->pwd);
-		if (node->path_fallback)
-			free(node->path_fallback);
+		st = process_read_line(&result, &current_prompt, prompt);
+		if (st < 0)
+		{
+			if (current_prompt != prompt)
+				free(current_prompt);
+			return (NULL);
+		}
+		if (st == 0)
+		{
+			if (current_prompt != prompt)
+				free(current_prompt);
+			return (result);
+		}
 	}
-	if (envp)
-		strarrfree(envp);
-	clear_history();
-	restore_termios();
-    (void)node;
-    exit(get_exit_status());
+	return (result);
 }
 
-/* Non-interactive read helpers removed */
+int	append_line(char **result, char *line)
+{
+	char	*tmp;
+
+	if (*result)
+	{
+		tmp = ft_strjoin(*result, "\n");
+		free(*result);
+		*result = ft_strjoin(tmp, line);
+		free(tmp);
+	}
+	else
+		*result = ft_strdup(line);
+	free(line);
+	return (*result != NULL);
+}

@@ -11,8 +11,6 @@
 /* ************************************************************************** */
 #include "minishell.h"
 
-#include <readline/readline.h>
-
 char	*get_continuation_line(char *prompt)
 {
 	char	*result;

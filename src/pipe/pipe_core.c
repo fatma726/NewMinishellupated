@@ -6,9 +6,10 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/10/02 21:47:43 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
 
 #ifdef BUILD_BONUS
@@ -52,12 +53,7 @@ void	exec_parents(char **args, char **envp, t_node *node)
 	backup_restor(node);
 }
 
-char	**cloturn(int backup_stdout, int backup_stdin, char **envp)
-{
-	close(backup_stdout);
-	close(backup_stdin);
-	return (envp);
-}
+/* cloturn function removed - backup FDs now closed directly in execute() */
 
 int	pipe_check(char **args, t_node *node)
 {

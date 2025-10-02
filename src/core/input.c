@@ -6,14 +6,11 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/10/02 21:44:38 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "minishell.h"
 
-#include <readline/readline.h>
-#include <readline/history.h>
-#include <stdio.h>
+#include "minishell.h"
 
 static void	mark_nontext(const char *buf, size_t nread)
 {

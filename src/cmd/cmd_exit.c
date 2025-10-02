@@ -6,10 +6,11 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/10/02 21:10:05 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/10/02 21:33:24 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minishell.h"
 
 void	handle_exit_message(void)
 {

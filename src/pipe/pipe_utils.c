@@ -6,9 +6,10 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/10/02 21:47:33 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
 
 void	backup_restor(t_node *node)
@@ -91,5 +92,7 @@ char	**execute(char **args, char **envp, t_node *node)
 	node->backup_stdin = dup(STDIN_FILENO);
 	envp = repeat(args, envp, node);
 	backup_restor(node);
-	return (cloturn(node->backup_stdout, node->backup_stdin, envp));
+	close(node->backup_stdout);
+	close(node->backup_stdin);
+	return (envp);
 }

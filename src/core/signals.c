@@ -13,8 +13,6 @@
 
 #include <signal.h>
 #include <termios.h>
-#include <readline/readline.h>
-#include <readline/history.h>
 
 static void	sigint_handler(int sig)
 {

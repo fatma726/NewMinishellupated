@@ -6,13 +6,10 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/10/02 21:10:05 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "minishell.h"
 
-#include <readline/readline.h>
-#include <readline/history.h>
 
 void	handle_exit_message(void)
 {
@@ -56,6 +53,10 @@ void	cleanup_child_and_exit(char **args, char **envp, t_node *node)
 		strarrfree(args);
 	if (envp)
 		strarrfree(envp);
+	if (node->backup_stdout >= 0)
+		close(node->backup_stdout);
+	if (node->backup_stdin >= 0)
+		close(node->backup_stdin);
 	exit(get_exit_status());
 }
 
@@ -73,6 +74,10 @@ void	cleanup_and_exit(char **args, char **envp, t_node *node)
 		strarrfree(args);
 	if (envp)
 		strarrfree(envp);
+	if (node->backup_stdout >= 0)
+		close(node->backup_stdout);
+	if (node->backup_stdin >= 0)
+		close(node->backup_stdin);
 	clear_history();
 	restore_termios();
 	exit(get_exit_status());

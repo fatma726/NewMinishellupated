@@ -20,6 +20,7 @@ COPY libs/Libft/*.c libs/Libft/
 COPY libs/Libft/libft.h libs/Libft/
 COPY Makefile .
 COPY *.supp .
+COPY leak-check.sh .
 
 # Remove any existing binaries to ensure clean compilation
 RUN rm -f minishell minishell_bonus

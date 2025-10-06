@@ -1,0 +1,1 @@
+./leak-check.sh: line 6: valgrind: command not found

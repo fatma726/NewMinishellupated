@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/10/06 18:10:19 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/10/06 21:23:24 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ int	main(int argc, char **argv, char **envp)
 	t_node		node;
 
 	(void)argc;
+	ft_bzero(&node, sizeof(t_node));
 	envp = bootstrap_env(argv, envp, &node);
 	while (1)
 		envp = main_loop(envp, &node);

@@ -29,7 +29,7 @@ MAIN   = env_utils env_utils2 env_helpers global nontext input input_helpers \
          main process_command process_command_standalone process_command_braces_quotes \
          core_utils strarrutils stubs signals semicolon_helpers semicolon_processing \
          semicolon_splitting cleanup
-CMD    = cmd_cd cmd_cd_helpers basic_commands cmd_utils env cmd_exec cmd_exec_helpers \
+CMD    = cmd_cd cmd_cd_helpers cmd_cd_utils basic_commands cmd_utils env cmd_exec cmd_exec_helpers \
          cmd_exec_proc cmd_exec_error cmd_exit cmd_exit_helpers cmd_exit_parse \
          cmd_export_helpers cmd_export_update cmd_export_print cmd_export_main \
          unset unset_utils

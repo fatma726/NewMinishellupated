@@ -181,6 +181,11 @@ bool			checks2(char **args, char **envp, t_node *node,
 					int offset);
 bool			checks(char **args, char **envp, t_node *node,
 					int offset);
+bool			validate_cd_args(char **args, int offset);
+char			**execute_cd(char **args, char **envp, t_node *node,
+					int offset);
+void			handle_cd_arguments(char **args, char **envp, t_node *node,
+					int offset);
 void			cmd_echo(char **args, t_node *node);
 char			**cmd_env(char **args, char **envs, t_node *node);
 char			**cmd_exec(char **args, char **envp, t_node *node);

@@ -1,0 +1,121 @@
+# MINISHELL MANUAL TEST COMMANDS
+# Copy and paste these into your minishell to test manually
+
+# ========== 1. BUILTINS ==========
+echo hello
+echo -n hello
+echo $USER
+pwd
+cd ..
+pwd
+cd
+pwd
+cd /nonexistent
+exit
+
+# ========== 2. EXPORT (Basic) ==========
+export A=42
+echo $A
+export B=hello C=world
+echo $B $C
+export D="quoted value"
+echo $D
+export E='single quoted'
+echo $E
+
+# ========== 2. EXPORT (Overwriting) ==========
+export A=first
+export A=second
+echo $A
+
+# ========== 2. EXPORT (Invalid Identifiers) ==========
+export =
+export 1A=42
+export @HOME=hi
+export A==B
+export A+B=5
+
+# ========== 2. EXPORT (Edge Cases) ==========
+export TEST
+env | grep TEST
+export TEST=
+env | grep TEST
+export TEST=" "
+echo $TEST
+unset TEST
+echo $TEST
+
+# ========== 3. UNSET ==========
+export A=hello
+unset A
+echo $A
+unset 1A
+unset
+unset PATH
+ls
+
+# ========== 4. REDIRECTIONS ==========
+echo hi > a.txt
+cat a.txt
+echo bye >> a.txt
+cat a.txt
+cat < a.txt
+cat < missing.txt
+ls > a.txt > b.txt
+cat b.txt
+
+# ========== 5. PIPES ==========
+ls | cat
+ls | wc -l
+echo hi | grep h
+echo hi | grep z
+echo hi | cat | cat
+
+# ========== 6. EXIT STATUS ==========
+echo $?
+ls
+echo $?
+ls /nonexistent 2>/dev/null
+echo $?
+
+# ========== 7. QUOTES ==========
+echo "hello world"
+echo 'hello world'
+echo "hi '$USER'"
+echo 'hi "$USER"'
+echo "$USER"
+echo '$USER'
+
+# ========== 8. ENVIRONMENT & PATH ==========
+env
+export PATH=$PATH:$PWD
+env | grep PATH
+export NEWVAR=$PWD
+echo $NEWVAR
+
+# ========== 9. ERROR HANDLING ==========
+| ls
+> file
+<
+cd /tmp /usr
+export =
+unset =
+
+# ========== 10. HEREDOC (if bonus implemented) ==========
+cat << EOF
+hi
+EOF
+
+cat << "EOF"
+$USER
+EOF
+
+# ========== 11. SPECIAL BASH BEHAVIOR ==========
+echo $SHLVL
+ls | grep .c > files.txt
+cat files.txt
+cat | cat
+
+# When done testing, exit:
+exit
+

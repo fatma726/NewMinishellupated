@@ -75,6 +75,7 @@ char	**parser(char *str, char **envp, t_node *node)
 	{
 		clear_nontext_input();
 		set_exit_status(127);
+		free(str);
 		return (envp);
 	}
 	args = process_parser_input(str, envp, node);

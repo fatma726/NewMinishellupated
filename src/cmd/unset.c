@@ -6,9 +6,10 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/10/06 18:21:05 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
 
 bool	is_valid_identifier(char *str)
@@ -46,6 +47,20 @@ static void	clear_path_fallback_if(char *str, t_node *node)
 	}
 }
 
+static void	remove_env_entry(char **envp, int i, int last)
+{
+	free(envp[i]);
+	if (i != last - 1)
+	{
+		envp[i] = envp[last - 1];
+		envp[last - 1] = NULL;
+	}
+	else
+	{
+		envp[i] = NULL;
+	}
+}
+
 char	**delete_env(char *str, char **envp, t_node *node, int *flag)
 {
 	int	i;
@@ -60,32 +75,11 @@ char	**delete_env(char *str, char **envp, t_node *node, int *flag)
 	{
 		if (find_envkey(str, envp[i]))
 		{
-			free(envp[i]);
-			envp[i] = envp[last - 1];
-			envp[last - 1] = NULL;
+			remove_env_entry(envp, i, last);
 			*flag = 1;
 			return (envp);
 		}
 	}
 	*flag = 1;
 	return (envp);
-}
-
-void	handle_unset_option_error(char **args)
-{
-	char	unset_error[25];
-	char	invalid1[35];
-	char	invalid2[30];
-	char	usage[15];
-
-	ft_strlcpy(unset_error, "minishell: unset: ", 25);
-	ft_putstr_fd(unset_error, STDERR_FILENO);
-	ft_putstr_fd(args[1], STDERR_FILENO);
-	ft_strlcpy(invalid1, ": invalid option\nunset: usage: unset ", 35);
-	ft_putstr_fd(invalid1, STDERR_FILENO);
-	ft_strlcpy(invalid2, "[-f] [-v] [-n] ", 30);
-	ft_putstr_fd(invalid2, STDERR_FILENO);
-	ft_strlcpy(usage, "[name ...]\n", 15);
-	ft_putstr_fd(usage, STDERR_FILENO);
-	set_exit_status(2);
 }

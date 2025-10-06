@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/10/02 21:47:33 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/10/06 18:54:01 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,11 +70,13 @@ char	**repeat(char **args, char **envp, t_node *node)
 		if (node->pipe_flag)
 			node->child_die = 1;
 		else
-			return (envp);
+			return (backup_restor(node), close(node->backup_stdout),
+				close(node->backup_stdin), envp);
 	}
 	pid = maybe_setup_pipe(node);
 	if (pid < 0)
-		return (envp);
+		return (backup_restor(node), close(node->backup_stdout),
+			close(node->backup_stdin), envp);
 	if (!node->pipe_flag)
 		return (one_commnad(args, envp, node));
 	repeat_exec(args, envp, node, pid);

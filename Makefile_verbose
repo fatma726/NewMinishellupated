@@ -28,7 +28,7 @@ LIBFT_OBJS := $(addprefix $(LIBFT_DIR)/, $(LIBFT_SRCS:.c=.o))
 MAIN   = env_utils env_utils2 env_helpers global nontext input input_helpers \
          main process_command process_command_standalone process_command_braces_quotes \
          core_utils strarrutils stubs signals semicolon_helpers semicolon_processing \
-         semicolon_splitting cleanup
+         semicolon_splitting
 CMD    = cmd_cd cmd_cd_helpers basic_commands cmd_utils env cmd_exec cmd_exec_helpers \
          cmd_exec_proc cmd_exec_error cmd_exit cmd_exit_helpers cmd_exit_parse \
          cmd_export_helpers cmd_export_update cmd_export_print cmd_export_main \
@@ -56,7 +56,6 @@ BONUS_SRCS := bonus/src/bonus/split_operators_main.c \
               bonus/src/bonus/split_operators_consolidated.c \
               bonus/src/bonus/split_operators_helpers2.c \
               bonus/src/bonus/split_operators_helpers3.c \
-              bonus/src/bonus/split_operators_helpers4.c \
               bonus/src/bonus/split_operators_tail.c \
               bonus/src/bonus/subshell_consolidated.c \
               bonus/src/bonus/subshell_main.c \

@@ -6,9 +6,10 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/10/06 18:54:01 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -386,6 +387,7 @@ char			**split_before_pipe_args(char **args, t_node *node);
 void			double_lmove_idx_change(char **args, int *i);
 /* is_pipe removed - declared but never defined */
 bool			is_ampersand(char *str);
+void			cleanup_env(char **envp, t_node *node);
 
 /* redirection */
 void			args_left_move(char **args, int i);

@@ -63,7 +63,8 @@ void	cleanup_child_and_exit(char **args, char **envp, t_node *node)
 
 void	cleanup_and_exit(char **args, char **envp, t_node *node)
 {
-	free(node->pwd);
+	if (node->pwd)
+		free(node->pwd);
 	if (node->path_fallback)
 		free(node->path_fallback);
 	if (node->ori_args)

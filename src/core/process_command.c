@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/10/01 00:37:28 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/10/06 18:28:03 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ char	**process_command(char *line, char **envp, t_node *n)
 	if (!line || is_blank(line))
 		return (free(line), envp);
 	if (handle_unmatched_quotes(line, n))
-		return (envp);
+		return (free(line), envp);
 	if (has_semicolon(line, n))
 		return (process_semicolon_commands(line, envp, n));
 	result = check_standalone_operators(line, envp, n);

@@ -6,10 +6,10 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/10/06 18:54:01 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "minishell.h"
+
 #include "../../include/bonus.h"
 
 static size_t	skip_left_ws(char *s)
@@ -91,3 +91,4 @@ int	is_wrapped_group(char *s, t_node *n,
 }
 
 /* split_operators_tail moved to its own compilation unit */
+/* handle_syntax_errors moved to split_operators_helpers4.c */

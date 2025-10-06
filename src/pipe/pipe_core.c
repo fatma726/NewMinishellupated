@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/10/02 21:47:43 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/10/06 18:18:11 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,4 +97,6 @@ void	init_node(t_node *node)
 	node->cmd = NULL;
 	node->heredoc_unterminated = false;
 	node->heredoc_swallowed_input = false;
+	node->backup_stdout = -1;
+	node->backup_stdin = -1;
 }

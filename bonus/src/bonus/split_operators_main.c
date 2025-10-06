@@ -6,7 +6,7 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/10/01 23:56:56 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/10/06 18:54:01 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,14 +68,12 @@ static char	**eval_group(char *inner, char **envp, t_node *n)
 {
 	int		pid;
 	int		status;
-	char	**envp_copy;
 
 	pid = fork();
 	if (pid == 0)
 	{
-		envp_copy = strarrdup(envp);
-		parser(inner, envp_copy, n);
-		strarrfree(envp_copy);
+		envp = process_command(inner, envp, n);
+		cleanup_env(envp, n);
 		exit(get_exit_status());
 	}
 	free(inner);
@@ -90,25 +88,22 @@ static char	**eval_group(char *inner, char **envp, t_node *n)
 }
 
 /* split_operators_tail moved to helpers3 */
+/* handle_syntax_errors moved to split_operators_helpers2.c */
 
 static char	**split_operators_after_index(
 	char *s, int i, char **envp, t_node *n)
 {
 	char	*left;
+	char	**result;
 
 	if (i < 0)
-	{
-		envp = parser(s, envp, n);
-		return (envp);
-	}
-	if (handle_invalid_start_and_report(s, (size_t)i, n))
-		return (envp);
-	if (has_triple_ops(s, (size_t)i))
-		return (syntax_err_pair(s, (size_t)i, n, 0), envp);
-	if (ft_strchr(s, '>'))
-		if (!check_redirection_syntax(s, n))
-			return (envp);
+		return (parser(s, envp, n));
+	result = handle_syntax_errors(s, i, envp, n);
+	if (result)
+		return (result);
 	left = ft_substr(s, 0, (size_t)i);
+	if (!left)
+		return (free(s), envp);
 	envp = parser(left, envp, n);
 	return (split_operators_tail(s, (size_t)i, envp, n));
 }
@@ -126,7 +121,10 @@ char	**split_operators(char *s, char **envp, t_node *n)
 		return (envp);
 	}
 	if (has_mixed_op_error(s, n))
+	{
+		free(s);
 		return (envp);
+	}
 	if (is_wrapped_group(s, n, &inner_start, &inner_len))
 	{
 		inner = ft_substr(s, (unsigned int)(inner_start), inner_len);

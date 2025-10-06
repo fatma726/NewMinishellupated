@@ -6,9 +6,10 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/10/06 14:57:45 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
 
 int	handle_escape_char(t_prompt_data *data)
@@ -37,13 +38,12 @@ int	handle_escape_char(t_prompt_data *data)
 
 void	handle_pwd_path(char **pwd, char **envp)
 {
-	static char	root[2] = "/";
 	char		*home;
 
 	home = ft_getenv("HOME", envp);
 	if (!home)
-		*pwd = root;
-	else if (!ft_strncmp(*pwd, home, ft_strlen(home)))
+		return ;
+	if (!ft_strncmp(*pwd, home, ft_strlen(home)))
 		*pwd = ft_strjoin("~", *pwd + ft_strlen(home));
 }
 

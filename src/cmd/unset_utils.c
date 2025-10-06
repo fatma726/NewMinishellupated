@@ -6,9 +6,10 @@
 /*   By: fatmtahmdabrahym <fatmtahmdabrahym@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 1970/01/01 00:00:00 by fatima            #+#    #+#             */
-/*   Updated: 2025/09/30 23:00:00 by fatmtahmdab      ###   ########.fr       */
+/*   Updated: 2025/10/06 18:21:05 by fatmtahmdab      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
 
 static void	handle_invalid_identifier(char *arg)
@@ -46,4 +47,23 @@ void	process_unset_args(char **args, char **envp, t_node *node, int *flag)
 		set_exit_status(EXIT_FAILURE);
 	else
 		set_exit_status(EXIT_SUCCESS);
+}
+
+void	handle_unset_option_error(char **args)
+{
+	char	unset_error[25];
+	char	invalid1[35];
+	char	invalid2[30];
+	char	usage[15];
+
+	ft_strlcpy(unset_error, "minishell: unset: ", 25);
+	ft_putstr_fd(unset_error, STDERR_FILENO);
+	ft_putstr_fd(args[1], STDERR_FILENO);
+	ft_strlcpy(invalid1, ": invalid option\nunset: usage: unset ", 35);
+	ft_putstr_fd(invalid1, STDERR_FILENO);
+	ft_strlcpy(invalid2, "[-f] [-v] [-n] ", 30);
+	ft_putstr_fd(invalid2, STDERR_FILENO);
+	ft_strlcpy(usage, "[name ...]\n", 15);
+	ft_putstr_fd(usage, STDERR_FILENO);
+	set_exit_status(2);
 }
